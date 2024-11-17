@@ -581,39 +581,42 @@ class ModernMolecularGUI(QMainWindow):
         return sidebar
 
     def create_home_page(self):
-        """Create a perfectly centered home page with integrated workflow container"""
         home_widget = QWidget()
         main_layout = QVBoxLayout(home_widget)
-        main_layout.setContentsMargins(0, 50, 0, 50)  # Add vertical margins
+        main_layout.setContentsMargins(0, 50, 0, 50)  # Top and bottom margins
         
         # Center container
         center_container = QWidget()
         center_layout = QVBoxLayout(center_container)
         center_layout.setAlignment(Qt.AlignCenter)
         
-        # Calculation workflow container
+        # Workflow container - KEY MEASUREMENTS
         workflow_container = QFrame()
         workflow_container.setStyleSheet("""
             QFrame {
                 background-color: #1E1E1E;
                 border-radius: 20px;
-                min-width: 500px;
-                max-width: 500px;
-                padding: 40px;
+                min-width: 480px;    /* Adjusted from 500px */
+                max-width: 480px;    /* Adjusted from 500px */
+                padding: 35px;       /* Adjusted from 40px */
             }
         """)
         workflow_layout = QVBoxLayout(workflow_container)
-        workflow_layout.setSpacing(30)  # Increased spacing between elements
+        workflow_layout.setSpacing(25)  # Space between elements
         
-        # Current CPU Units Box
-        current_cpu_box = QFrame()
-        current_cpu_box.setStyleSheet("""
+        # Stats boxes - KEY MEASUREMENTS
+        stats_box_style = """
             QFrame {
                 background-color: #262626;
                 border-radius: 15px;
-                padding: 20px 30px;
+                padding: 20px 25px;  /* Vertical 20px, Horizontal 25px */
+                margin: 5px 0px;     /* Small vertical margin */
             }
-        """)
+        """
+        
+        # Current CPU Units Box
+        current_cpu_box = QFrame()
+        current_cpu_box.setStyleSheet(stats_box_style)
         current_cpu_layout = QVBoxLayout(current_cpu_box)
         current_cpu_layout.setSpacing(8)
         
@@ -639,13 +642,7 @@ class ModernMolecularGUI(QMainWindow):
         
         # Total CPU Units Box
         total_cpu_box = QFrame()
-        total_cpu_box.setStyleSheet("""
-            QFrame {
-                background-color: #262626;
-                border-radius: 15px;
-                padding: 20px 30px;
-            }
-        """)
+        total_cpu_box.setStyleSheet(stats_box_style)
         total_cpu_layout = QVBoxLayout(total_cpu_box)
         total_cpu_layout.setSpacing(8)
         
