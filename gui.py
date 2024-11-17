@@ -489,21 +489,25 @@ class ModernMolecularGUI(QMainWindow):
         )
 
         layout = QVBoxLayout(sidebar)
-        layout.setSpacing(30)  # Spacing between sidebar elements
-        layout.setContentsMargins(0, 0, 0, 0)
+        layout.setSpacing(10)  # Spacing between sidebar elements
+        layout.setContentsMargins(15,15,15,15)
 
-        # App Name Logo
-        logo_label = QLabel("MolecularUniverse")
-        logo_label.setStyleSheet(
-            "font-size: 24px; font-weight: bold; color: white; margin-bottom: 40px;"  # Logo styling
-        )
-        layout.addWidget(logo_label, alignment=Qt.AlignCenter)
-
-        # Profile section
+        # App Name Logo with mixed weight
+        logo_label = QLabel()
+        logo_label.setText("<span style='font-weight:bold;'>Molecular</span>Universe")
+        logo_label.setStyleSheet("""
+            QLabel {
+                font-size: 20px;
+                color: white;
+                margin-bottom: 30px;
+            }
+        """)
+        layout.addWidget(logo_label, alignment=Qt.AlignLeft)  # Align left
+    # Profile section with better alignment
         profile_widget = QWidget()
         profile_layout = QVBoxLayout(profile_widget)
-        profile_layout.setSpacing(10)  # Reduced spacing for better alignment
-        profile_layout.setAlignment(Qt.AlignCenter)
+        profile_layout.setSpacing(8)
+        profile_layout.setContentsMargins(0, 0, 0, 20)  # Add bottom margin
 
         # Profile Picture
         profile_pic_label = QLabel()
@@ -553,8 +557,8 @@ class ModernMolecularGUI(QMainWindow):
         )
 
         # Assemble profile layout: Image above Name
-        profile_layout.addWidget(profile_pic_label)
-        profile_layout.addWidget(user_name_label)
+        profile_layout.addWidget(profile_pic_label, alignment=Qt.AlignCenter)
+        profile_layout.addWidget(user_name_label, alignment=Qt.AlignCenter)
         profile_layout.addWidget(edit_button, alignment=Qt.AlignCenter)
         layout.addWidget(profile_widget)
 
@@ -788,20 +792,72 @@ class ModernMolecularGUI(QMainWindow):
         return home_widget
 
     def start_auto_mode(self):
-        """Handle auto mode activation"""
-        self.notification_banner.setText("Auto Mode has started.")
-        self.notification_banner.setStyleSheet("""
-            QLabel {
-                background-color: #7CD332;
-                color: white;
-                font-size: 18px;
-                padding: 10px;
-                border-radius: 8px;
-            }
-        """)
-        self.notification_banner.show()
-        QTimer.singleShot(3000, self.notification_banner.hide)
-        self.cpu_usage_timer.start(1000)
+        """Handle auto mode activation/deactivation"""
+        if not hasattr(self, 'auto_mode_active'):
+            self.auto_mode_active = False
+        
+        if not self.auto_mode_active:
+            # Start Auto Mode
+            self.auto_button.setText("Stop")
+            self.auto_button.setStyleSheet("""
+                QPushButton {
+                    background-color: #D9534F;
+                    color: white;
+                    border: none;
+                    border-radius: 8px;
+                    font-size: 15px;
+                    font-weight: bold;
+                    font-family: 'Segoe UI', Arial;
+                }
+                QPushButton:hover {
+                    background-color: #C9302C;
+                }
+            """)
+            self.auto_mode_active = True
+            self.notification_banner.setText("Auto Mode has started.")
+            self.notification_banner.setStyleSheet("""
+                QLabel {
+                    background-color: #7CD332;
+                    color: white;
+                    font-size: 18px;
+                    padding: 10px;
+                    border-radius: 8px;
+                }
+            """)
+            self.notification_banner.show()
+            QTimer.singleShot(3000, self.notification_banner.hide)
+            self.cpu_usage_timer.start(1000)
+        else:
+            # Stop Auto Mode
+            self.auto_button.setText("Auto Mode")
+            self.auto_button.setStyleSheet("""
+                QPushButton {
+                    background-color: #7CD332;
+                    color: white;
+                    border: none;
+                    border-radius: 8px;
+                    font-size: 15px;
+                    font-weight: bold;
+                    font-family: 'Segoe UI', Arial;
+                }
+                QPushButton:hover {
+                    background-color: #6BC22B;
+                }
+            """)
+            self.auto_mode_active = False
+            self.notification_banner.setText("Auto Mode has stopped.")
+            self.notification_banner.setStyleSheet("""
+                QLabel {
+                    background-color: #D9534F;
+                    color: white;
+                    font-size: 18px;
+                    padding: 10px;
+                    border-radius: 8px;
+                }
+            """)
+            self.notification_banner.show()
+            QTimer.singleShot(3000, self.notification_banner.hide)
+            self.cpu_usage_timer.stop()
 
     def start_manual_mode(self):
         """Handle manual mode activation/deactivation"""
