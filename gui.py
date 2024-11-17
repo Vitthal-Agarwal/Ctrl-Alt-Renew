@@ -112,15 +112,15 @@ class ModernMolecularGUI(QMainWindow):
                 background-color: #1E1E1E;
                 min-width: 300px;  /* Sidebar width */
                 max-width: 300px;
-                padding: 30px;     /* Sidebar padding */
+                padding: 20px;     /* Sidebar padding */
             }
             QLabel {
                 color: white;
             }
             QPushButton {
                 text-align: left;
-                padding: 15px;          /* Button padding */
-                margin: 6px 0;          /* Button margin */
+                padding: 12px;          /* Button padding */
+                margin: 4px 0;          /* Button margin */
                 color: white;
                 border-radius: 8px;
                 font-size: 16px;        /* Button font size */
@@ -136,7 +136,7 @@ class ModernMolecularGUI(QMainWindow):
         )
 
         layout = QVBoxLayout(sidebar)
-        layout.setSpacing(30)  # Spacing between sidebar elements
+        layout.setSpacing(24)  # Spacing between sidebar elements
         layout.setContentsMargins(0, 0, 0, 0)
 
         # App Name Logo
@@ -149,7 +149,7 @@ class ModernMolecularGUI(QMainWindow):
         # Profile section
         profile_widget = QWidget()
         profile_layout = QVBoxLayout(profile_widget)
-        profile_layout.setSpacing(15)  # Spacing between profile elements
+        profile_layout.setSpacing(8)  # Spacing between profile elements
         profile_layout.setAlignment(Qt.AlignCenter)
 
         # Profile Picture
