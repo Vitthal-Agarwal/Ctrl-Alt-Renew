@@ -583,33 +583,61 @@ class ModernMolecularGUI(QMainWindow):
     def create_home_page(self):
         home_widget = QWidget()
         main_layout = QVBoxLayout(home_widget)
-        main_layout.setContentsMargins(0, 50, 0, 50)  # Top and bottom margins
+        main_layout.setContentsMargins(0, 50, 0, 50)
         
         # Center container
         center_container = QWidget()
         center_layout = QVBoxLayout(center_container)
         center_layout.setAlignment(Qt.AlignCenter)
         
-        # Workflow container - KEY MEASUREMENTS
+        # Workflow container
         workflow_container = QFrame()
         workflow_container.setStyleSheet("""
             QFrame {
                 background-color: #1E1E1E;
                 border-radius: 20px;
-                min-width: 480px;    /* Adjusted from 500px */
-                max-width: 480px;    /* Adjusted from 500px */
-                padding: 35px;       /* Adjusted from 40px */
+                min-width: 480px;
+                max-width: 480px;
+                padding: 35px;
             }
         """)
         workflow_layout = QVBoxLayout(workflow_container)
-        workflow_layout.setSpacing(25)  # Space between elements
+        workflow_layout.setSpacing(25)
+        
+        # Add Dashboard Heading
+        dashboard_title = QLabel("Calculation Workflow")
+        dashboard_title.setStyleSheet("""
+            QLabel {
+                color: white;
+                font-size: 24px;
+                font-weight: bold;
+                font-family: 'Segoe UI', Arial;
+                margin-bottom: 10px;
+            }
+        """)
+        dashboard_title.setAlignment(Qt.AlignCenter)
+        
+        # Add subtitle
+        subtitle = QLabel("The program will execute when your computer is idle")
+        subtitle.setStyleSheet("""
+            QLabel {
+                color: #888888;
+                font-size: 14px;
+                font-family: 'Segoe UI', Arial;
+                margin-bottom: 20px;
+            }
+        """)
+        subtitle.setAlignment(Qt.AlignCenter)
+        
+        workflow_layout.addWidget(dashboard_title)
+        workflow_layout.addWidget(subtitle)
         
         # Stats boxes - KEY MEASUREMENTS
         stats_box_style = """
             QFrame {
                 background-color: #262626;
                 border-radius: 15px;
-                padding: 20px 25px;  /* Vertical 20px, Horizontal 25px */
+                padding: 0px -15px;  /* Vertical 20px, Horizontal 25px */
                 margin: 5px 0px;     /* Small vertical margin */
             }
         """
