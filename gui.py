@@ -1,4 +1,4 @@
-import sys
+import sys, random
 from PyQt5.QtWidgets import (
     QApplication,
     QMainWindow,
@@ -353,26 +353,22 @@ class ModernMolecularGUI(QMainWindow):
             QPushButton:hover {
                 background-color: #333333;
             }
-            QRadioButton {
-                font-size: 16px;
-                color: white;
-            }
         """)
 
         # Create main widget and layout
         main_widget = QWidget()
         self.setCentralWidget(main_widget)
-        main_layout = QHBoxLayout(main_widget)
-        main_layout.setSpacing(0)
-        main_layout.setContentsMargins(0, 0, 0, 0)
+        self.main_layout = QHBoxLayout(main_widget)
+        self.main_layout.setSpacing(0)
+        self.main_layout.setContentsMargins(0, 0, 0, 0)
 
         # Add sidebar
         sidebar = self.create_sidebar()
-        main_layout.addWidget(sidebar)
+        self.main_layout.addWidget(sidebar)
 
         # Add content area with stacked widget for navigation
         self.stacked_widget = QStackedWidget()
-        main_layout.addWidget(self.stacked_widget, 1)  # 1 is the stretch factor
+        self.main_layout.addWidget(self.stacked_widget, 1)  # 1 is the stretch factor
 
         # Create individual pages
         self.home_page = self.create_home_page()
@@ -546,6 +542,21 @@ class ModernMolecularGUI(QMainWindow):
         layout.setSpacing(20)
         layout.setContentsMargins(30, 30, 30, 30)
 
+        # **Notification Banner**
+        self.notification_banner = QLabel()
+        self.notification_banner.setFixedHeight(50)
+        self.notification_banner.setStyleSheet("""
+            QLabel {
+                background-color: #7CD332;
+                color: white;
+                font-size: 18px;
+                padding: 10px;
+                border-radius: 8px;
+            }
+        """)
+        self.notification_banner.hide()  # Hidden by default
+        layout.addWidget(self.notification_banner)
+
         # **Add CPU Units Given Boxes**
         cpu_boxes_widget = QWidget()
         cpu_boxes_layout = QVBoxLayout(cpu_boxes_widget)
@@ -553,45 +564,45 @@ class ModernMolecularGUI(QMainWindow):
         cpu_boxes_layout.setSpacing(20)
 
         # Current CPU Power Units Given Box
-        current_cpu_box = QFrame()
-        current_cpu_box.setFixedSize(400, 150)
-        current_cpu_box.setStyleSheet("""
+        self.current_cpu_box = QFrame()
+        self.current_cpu_box.setFixedSize(400, 150)
+        self.current_cpu_box.setStyleSheet("""
             QFrame {
                 background-color: #1E1E1E;
                 border-radius: 20px;
             }
         """)
-        current_cpu_layout = QVBoxLayout(current_cpu_box)
+        current_cpu_layout = QVBoxLayout(self.current_cpu_box)
         current_cpu_label = QLabel("Current CPU Power Units Given")
         current_cpu_label.setStyleSheet("color: white; font-size: 24px;")
-        current_cpu_value = QLabel("1500 Units")
-        current_cpu_value.setStyleSheet("color: #7CD332; font-size: 48px; font-weight: bold;")
+        self.current_cpu_value = QLabel("0 Units")
+        self.current_cpu_value.setStyleSheet("color: #7CD332; font-size: 48px; font-weight: bold;")
         current_cpu_layout.addStretch()
         current_cpu_layout.addWidget(current_cpu_label, alignment=Qt.AlignCenter)
-        current_cpu_layout.addWidget(current_cpu_value, alignment=Qt.AlignCenter)
+        current_cpu_layout.addWidget(self.current_cpu_value, alignment=Qt.AlignCenter)
         current_cpu_layout.addStretch()
 
         # Total CPU Units Given So Far Box
-        total_cpu_box = QFrame()
-        total_cpu_box.setFixedSize(350, 120)
-        total_cpu_box.setStyleSheet("""
+        self.total_cpu_box = QFrame()
+        self.total_cpu_box.setFixedSize(350, 120)
+        self.total_cpu_box.setStyleSheet("""
             QFrame {
                 background-color: #333333;
                 border-radius: 20px;
             }
         """)
-        total_cpu_layout = QVBoxLayout(total_cpu_box)
+        total_cpu_layout = QVBoxLayout(self.total_cpu_box)
         total_cpu_label = QLabel("Total CPU Units Contributed")
         total_cpu_label.setStyleSheet("color: white; font-size: 20px;")
-        total_cpu_value = QLabel("25,000 Units")
-        total_cpu_value.setStyleSheet("color: #FFD700; font-size: 36px; font-weight: bold;")
+        self.total_cpu_value = QLabel("0 Units")
+        self.total_cpu_value.setStyleSheet("color: #FFD700; font-size: 36px; font-weight: bold;")
         total_cpu_layout.addStretch()
         total_cpu_layout.addWidget(total_cpu_label, alignment=Qt.AlignCenter)
-        total_cpu_layout.addWidget(total_cpu_value, alignment=Qt.AlignCenter)
+        total_cpu_layout.addWidget(self.total_cpu_value, alignment=Qt.AlignCenter)
         total_cpu_layout.addStretch()
 
-        cpu_boxes_layout.addWidget(current_cpu_box)
-        cpu_boxes_layout.addWidget(total_cpu_box)
+        cpu_boxes_layout.addWidget(self.current_cpu_box)
+        cpu_boxes_layout.addWidget(self.total_cpu_box)
 
         layout.addWidget(cpu_boxes_widget, alignment=Qt.AlignCenter)
 
@@ -602,9 +613,9 @@ class ModernMolecularGUI(QMainWindow):
         workflow_buttons_layout.setSpacing(40)
 
         # Auto Button
-        auto_button = QPushButton("Auto Mode")
-        auto_button.setFixedSize(180, 60)
-        auto_button.setStyleSheet("""
+        self.auto_button = QPushButton("Auto Mode")
+        self.auto_button.setFixedSize(180, 60)
+        self.auto_button.setStyleSheet("""
             QPushButton {
                 background-color: #7CD332;
                 border-radius: 30px;
@@ -616,12 +627,12 @@ class ModernMolecularGUI(QMainWindow):
                 background-color: #6BC22B;
             }
         """)
-        auto_button.clicked.connect(self.start_auto_mode)
+        self.auto_button.clicked.connect(self.start_auto_mode)
 
         # Manual Button
-        manual_button = QPushButton("Manual Mode")
-        manual_button.setFixedSize(180, 60)
-        manual_button.setStyleSheet("""
+        self.manual_button = QPushButton("Manual Mode")
+        self.manual_button.setFixedSize(180, 60)
+        self.manual_button.setStyleSheet("""
             QPushButton {
                 background-color: #FFA500;
                 border-radius: 30px;
@@ -633,25 +644,133 @@ class ModernMolecularGUI(QMainWindow):
                 background-color: #E59400;
             }
         """)
-        manual_button.clicked.connect(self.start_manual_mode)
+        self.manual_button.clicked.connect(self.start_manual_mode)
 
-        workflow_buttons_layout.addWidget(auto_button)
-        workflow_buttons_layout.addWidget(manual_button)
+        workflow_buttons_layout.addWidget(self.auto_button)
+        workflow_buttons_layout.addWidget(self.manual_button)
 
         layout.addWidget(workflow_buttons_widget, alignment=Qt.AlignCenter)
 
         # Spacer to push content to the top
         layout.addStretch()
 
+        # **Timers and State Variables**
+        self.cpu_usage_timer = QTimer()
+        self.cpu_usage_timer.timeout.connect(self.update_cpu_usage)
+        self.cpu_usage_level = 0  # Simulated CPU usage level
+
+        self.manual_mode_active = False  # Track manual mode state
+
         return content_widget
-    
+
     def start_auto_mode(self):
-        # Implement the logic for starting auto mode
-        print("Auto Mode Started")
+        # Display a banner that Auto Mode has started
+        self.notification_banner.setText("Auto Mode has started.")
+        self.notification_banner.setStyleSheet("""
+            QLabel {
+                background-color: #7CD332;
+                color: white;
+                font-size: 18px;
+                padding: 10px;
+                border-radius: 8px;
+            }
+        """)
+        self.notification_banner.show()
+
+        # Hide the banner after 3 seconds
+        QTimer.singleShot(3000, self.notification_banner.hide)
+
+        # Start updating CPU usage
+        self.cpu_usage_timer.start(1000)  # Update every second
 
     def start_manual_mode(self):
-        # Implement the logic for starting manual mode
-        print("Manual Mode Started")
+        if not self.manual_mode_active:
+            # Change button to Stop
+            self.manual_button.setText("Stop")
+            self.manual_button.setStyleSheet("""
+                QPushButton {
+                    background-color: #D9534F;
+                    border-radius: 30px;
+                    color: white;
+                    font-size: 20px;
+                    font-weight: bold;
+                }
+                QPushButton:hover {
+                    background-color: #C9302C;
+                }
+            """)
+            self.manual_mode_active = True
+
+            # Display a banner
+            self.notification_banner.setText("Manual Mode has started.")
+            self.notification_banner.setStyleSheet("""
+                QLabel {
+                    background-color: #FFA500;
+                    color: white;
+                    font-size: 18px;
+                    padding: 10px;
+                    border-radius: 8px;
+                }
+            """)
+            self.notification_banner.show()
+            QTimer.singleShot(3000, self.notification_banner.hide)
+
+            # Start updating CPU usage
+            self.cpu_usage_timer.start(1000)  # Update every second
+        else:
+            # Change button back to Manual Mode
+            self.manual_button.setText("Manual Mode")
+            self.manual_button.setStyleSheet("""
+                QPushButton {
+                    background-color: #FFA500;
+                    border-radius: 30px;
+                    color: white;
+                    font-size: 20px;
+                    font-weight: bold;
+                }
+                QPushButton:hover {
+                    background-color: #E59400;
+                }
+            """)
+            self.manual_mode_active = False
+
+            # Display a banner
+            self.notification_banner.setText("Manual Mode has stopped.")
+            self.notification_banner.setStyleSheet("""
+                QLabel {
+                    background-color: #D9534F;
+                    color: white;
+                    font-size: 18px;
+                    padding: 10px;
+                    border-radius: 8px;
+                }
+            """)
+            self.notification_banner.show()
+            QTimer.singleShot(3000, self.notification_banner.hide)
+
+            # Stop updating CPU usage
+            self.cpu_usage_timer.stop()
+
+    def update_cpu_usage(self):
+        # Simulate CPU usage level change
+        self.cpu_usage_level = random.randint(0, 100)
+        self.current_cpu_value.setText(f"{self.cpu_usage_level} Units")
+
+        # Change color based on CPU usage level
+        if self.cpu_usage_level < 30:
+            color = "#7CD332"  # Green
+        elif self.cpu_usage_level < 60:
+            color = "#FFD700"  # Gold
+        elif self.cpu_usage_level < 90:
+            color = "#FFA500"  # Orange
+        else:
+            color = "#D9534F"  # Red
+
+        self.current_cpu_value.setStyleSheet(f"color: {color}; font-size: 48px; font-weight: bold;")
+
+        # Update total CPU units contributed
+        total_units = int(self.total_cpu_value.text().split()[0]) + self.cpu_usage_level
+        self.total_cpu_value.setText(f"{total_units} Units")
 
     def create_rankings_page(self):
         rankings_widget = QWidget()
@@ -1018,12 +1137,12 @@ class ModernMolecularGUI(QMainWindow):
         """
         )
 
-
 def start_app(future_df=None, computation_manager=None):
     app = QApplication(sys.argv)
 
     # Set application-wide style
     app.setStyle("Fusion")
+
 
     # Set palette to match the overall theme
     palette = QPalette()
