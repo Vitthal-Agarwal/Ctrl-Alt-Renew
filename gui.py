@@ -334,491 +334,361 @@ class ModernMolecularGUI(QMainWindow):
         self.future_df = future_df
         self.computation_manager = computation_manager
         
-        # Initialize data for leaderboards
-        self.weekly_data = [
-            [1, "Alice Smith", "alice@example.com", "Alice", 1500, 100],
-            [2, "Bob Johnson", "bob@example.com", "Bob", 1400, 90],
-            [3, "Charlie Brown", "charlie@example.com", "Charlie", 1300, 80],
-            [4, "David Wilson", "david@example.com", "David", 1200, 70],
-            [5, "Eva Green", "eva@example.com", "Eva", 1100, 60],
-        ]
+        # Set window to full screen
+        self.showMaximized()
         
-        self.all_time_data = [
-            [1, "Andre Neto Win", "andre.neto.c.w@conceptpatech.com", "Neto Win", 132383, 360],
-            [2, "Dan Hannah", "dan.hannah@ses.ai", "dan.hannah", 126554, 199],
-            [3, "Roberta QATest", "robertaqatest@gmail.com", "qatest", 109424, 170],
-            [4, "Cristiano Moraes", "cristianomoraescar@gmail.com", "ccmoraes", 81421, 121],
-            [5, "Daniel Walsh", "danwalshhh@gmail.com", "Dan", 50477, 91],
-            [6, "Leandro Barbosa", "leandro@fanhero.com", "leeaandrob", 36100, 60],
-            [7, "Raquel Comunale", "comunale.qa@gmail.com", "comunale.qa", 24005, 41],
-            [8, "Raul Burd", "raul@conceptpatech.com", "RB", 22928, 52],
-            [9, "Sarah Chen", "sarah.chen@example.com", "SarahC", 21500, 48],
-        [10, "Michael Rodriguez", "mrodriguez@example.com", "MikeR", 20100, 45],
-        [11, "Emma Thompson", "emma.t@example.com", "EmmaT", 19500, 43],
-        [12, "James Wilson", "jwilson@example.com", "JWil", 18900, 40],
-        [13, "Lisa Anderson", "lisa.a@example.com", "LisaA", 17800, 38],
-        [14, "Kevin Park", "kpark@example.com", "KPark", 16700, 35],
-        [15, "Maria Garcia", "mgarcia@example.com", "MariaG", 15600, 33],
-        [16, "Thomas Brown", "tbrown@example.com", "TomB", 14500, 30],
-        [17, "Anna Kim", "akim@example.com", "AnnaK", 13400, 28],
-        [18, "Peter Zhang", "pzhang@example.com", "PeterZ", 12300, 25],
-        [19, "Sophie Martin", "smartin@example.com", "SophieM", 11200, 23],
-        [20, "David Lee", "dlee@example.com", "DaveL", 10100, 20],
-        ]
+        # Initialize data and UI
+        self.init_data()
+        self.init_ui()
         
-        self.initUI()
-
-    def initUI(self):
-        self.setWindowTitle("Molecular Universe")
-        self.showFullScreen()  # Make the application full screen
+    def init_ui(self):
+        """Initialize the main UI components"""
+        # Create main layout
+        main_layout = QHBoxLayout()
+        main_layout.setContentsMargins(0, 0, 0, 0)
+        main_layout.setSpacing(0)
+        
+        # Add sidebar
+        sidebar = self.create_sidebar()
+        main_layout.addWidget(sidebar)
+        
+        # Create and setup pages
+        self.setup_pages()
+        
+        # Create central widget
+        central_widget = QWidget()
+        central_widget.setLayout(main_layout)
+        self.setCentralWidget(central_widget)
+        
+        # Set window properties
+        self.setWindowTitle("MolecularUniverse")
         self.setStyleSheet("""
             QMainWindow {
                 background-color: #F5F5F5;
             }
-            QLabel {
-                color: #333;
-            }
-            QPushButton {
-                border: none;
-                padding: 8px;
-                border-radius: 4px;
-                color: white;
-                background-color: #1E1E1E;
-            }
-            QPushButton:hover {
-                background-color: #333333;
-            }
         """)
 
-        # Create main widget and layout
-        main_widget = QWidget()
-        self.setCentralWidget(main_widget)
-        self.main_layout = QHBoxLayout(main_widget)
-        self.main_layout.setSpacing(0)
-        self.main_layout.setContentsMargins(0, 0, 0, 0)
-
-        # Add sidebar
-        sidebar = self.create_sidebar()
-        self.main_layout.addWidget(sidebar)
-
-        # Add content area with stacked widget for navigation
-        self.stacked_widget = QStackedWidget()
-        self.main_layout.addWidget(self.stacked_widget, 1)  # 1 is the stretch factor
-
-        # Create individual pages
-        self.home_page = self.create_home_page()
-        self.rankings_page = self.create_rankings_page()
-        self.future_schedule_page = self.create_future_schedule_page()
-
-        # Add pages to stacked widget
-        self.stacked_widget.addWidget(self.home_page)  # Index 0
-        self.stacked_widget.addWidget(self.rankings_page)  # Index 1
-        self.stacked_widget.addWidget(self.future_schedule_page)  # Index 2
-
-        # Set default page
-        self.stacked_widget.setCurrentWidget(self.home_page)
-
-    def update_period(self):
-        selected_period = self.period_combo.currentText()
-        
-        # Implement logic to filter data based on the selected period
-        if selected_period == "Last 30 days":
-            # Filter or modify self.all_time_data as needed
-            self.populate_table(self.rankings_table, self.all_time_data)  # Replace with actual filtering logic
-        elif selected_period == "Last 60 days":
-            # Implement logic for Last 60 days
-            self.populate_table(self.rankings_table, self.all_time_data)  # Replace with actual filtering logic
-        elif selected_period == "All time":
-            # Show all-time data
-            self.populate_table(self.rankings_table, self.all_time_data)  # Replace with actual filtering logic
-
     def create_sidebar(self):
-        sidebar = QFrame()
-        sidebar.setStyleSheet(
-            """
-            QFrame {
+        """Create an enhanced sidebar matching the reference design"""
+        sidebar = QWidget()
+        sidebar.setFixedWidth(280)  # Increased width
+        sidebar.setStyleSheet("""
+            QWidget {
                 background-color: #1E1E1E;
-                min-width: 300px;  /* Sidebar width */
-                max-width: 300px;
-                padding: 30px;     /* Sidebar padding */
+                color: white;
             }
+        """)
+        
+        sidebar_layout = QVBoxLayout(sidebar)
+        sidebar_layout.setContentsMargins(0, 0, 0, 0)
+        sidebar_layout.setSpacing(0)
+
+        # App Title with split styling
+        title_container = QWidget()
+        title_container.setStyleSheet("""
+            QWidget {
+                padding: 30px 25px;
+                background-color: #1E1E1E;
+            }
+        """)
+        title_layout = QHBoxLayout(title_container)
+        title_layout.setContentsMargins(0, 0, 0, 0)
+        
+        # Create split title (Molecular + Universe)
+        molecular_label = QLabel("Molecular")
+        universe_label = QLabel("Universe")
+        
+        molecular_label.setStyleSheet("""
             QLabel {
                 color: white;
+                font-size: 24px;
+                font-weight: bold;
+                font-family: 'Segoe UI', Arial;
             }
+        """)
+        
+        universe_label.setStyleSheet("""
+            QLabel {
+                color: #7CD332;
+                font-size: 24px;
+                font-weight: normal;
+                font-family: 'Segoe UI', Arial;
+            }
+        """)
+        
+        title_layout.addWidget(molecular_label)
+        title_layout.addWidget(universe_label)
+        title_layout.addStretch()
+        
+        sidebar_layout.addWidget(title_container)
+
+        # Profile Section
+        profile_container = QWidget()
+        profile_container.setStyleSheet("""
+            QWidget {
+                padding: 25px;
+            }
+        """)
+        profile_layout = QVBoxLayout(profile_container)
+        profile_layout.setSpacing(15)
+        
+        # Profile Image with circular mask
+        profile_image = QLabel()
+        try:
+            pixmap = QPixmap("dan.jpeg")
+            if not pixmap.isNull():
+                # Create circular mask
+                rounded_pixmap = QPixmap(pixmap.size())
+                rounded_pixmap.fill(Qt.transparent)
+                
+                painter = QPainter(rounded_pixmap)
+                painter.setRenderHint(QPainter.Antialiasing)
+                
+                path = QPainterPath()
+                path.addEllipse(0, 0, pixmap.width(), pixmap.height())
+                painter.setClipPath(path)
+                painter.drawPixmap(0, 0, pixmap)
+                painter.end()
+                
+                # Scale the image
+                scaled_pixmap = rounded_pixmap.scaled(100, 100, Qt.KeepAspectRatio, Qt.SmoothTransformation)
+                profile_image.setPixmap(scaled_pixmap)
+                profile_image.setAlignment(Qt.AlignCenter)
+        except Exception as e:
+            print(f"Error loading profile image: {e}")
+            # Fallback to placeholder
+            profile_image.setText("👤")
+            profile_image.setStyleSheet("font-size: 40px; color: #7CD332;")
+        
+        profile_layout.addWidget(profile_image, alignment=Qt.AlignCenter)
+        
+        # Name Label
+        name_label = QLabel("Daniel Walsh")
+        name_label.setAlignment(Qt.AlignCenter)
+        name_label.setStyleSheet("""
+            font-size: 20px;
+            font-weight: bold;
+            color: white;
+            font-family: 'Segoe UI', Arial;
+            margin-top: 10px;
+        """)
+        profile_layout.addWidget(name_label)
+        
+        # Edit Button
+        edit_btn = QPushButton("Edit")
+        edit_btn.setCursor(Qt.PointingHandCursor)
+        edit_btn.setStyleSheet("""
+            QPushButton {
+                background-color: #333333;
+                border: none;
+                padding: 8px 20px;
+                border-radius: 4px;
+                color: white;
+                font-size: 13px;
+                max-width: 70px;
+                font-family: 'Segoe UI', Arial;
+            }
+            QPushButton:hover {
+                background-color: #444444;
+            }
+        """)
+        profile_layout.addWidget(edit_btn, alignment=Qt.AlignCenter)
+        
+        sidebar_layout.addWidget(profile_container)
+
+        # Navigation Menu
+        nav_container = QWidget()
+        nav_layout = QVBoxLayout(nav_container)
+        nav_layout.setContentsMargins(0, 20, 0, 0)
+        nav_layout.setSpacing(2)
+
+        # Updated navigation buttons with icons
+        nav_buttons = [
+            (self.home_btn, "🏠", "Calculate", self.show_home),
+            (self.rankings_btn, "📊", "Rankings", self.show_rankings),
+            (self.history_btn, "📋", "History", self.show_history)
+        ]
+
+        for btn_ref, icon, text, callback in nav_buttons:
+            btn = QPushButton(f"{icon} {text}")
+            btn.setCursor(Qt.PointingHandCursor)
+            btn.setStyleSheet("""
+                QPushButton {
+                    text-align: left;
+                    padding: 15px 25px;
+                    border: none;
+                    color: white;
+                    font-size: 16px;
+                    font-family: 'Segoe UI', Arial;
+                    background-color: transparent;
+                    border-left: 3px solid transparent;
+                }
+                QPushButton:hover {
+                    background-color: #333333;
+                    border-left: 3px solid #7CD332;
+                }
+                QPushButton[Active=true] {
+                    background-color: #333333;
+                    border-left: 3px solid #7CD332;
+                    color: #7CD332;
+                }
+            """)
+            btn.clicked.connect(callback)
+            nav_layout.addWidget(btn)
+            setattr(self, btn_ref, btn)
+
+        sidebar_layout.addWidget(nav_container)
+        sidebar_layout.addStretch()
+
+        # Logout Section
+        logout_container = QWidget()
+        logout_container.setStyleSheet("padding: 20px;")
+        logout_layout = QVBoxLayout(logout_container)
+        
+        self.logout_btn = QPushButton("🚪 Logout")
+        self.logout_btn.setCursor(Qt.PointingHandCursor)
+        self.logout_btn.setStyleSheet("""
             QPushButton {
                 text-align: left;
-                padding: 15px;          /* Button padding */
-                margin: 6px 0;          /* Button margin */
+                padding: 15px 25px;
+                border: none;
                 color: white;
-                border-radius: 8px;
-                font-size: 16px;        /* Button font size */
-                font-weight: 500;       /* Button font weight */
-                background-color: #1E1E1E;
+                font-size: 16px;
+                font-family: 'Segoe UI', Arial;
+                background-color: transparent;
+                border-left: 3px solid transparent;
             }
             QPushButton:hover {
                 background-color: #333333;
+                border-left: 3px solid #7CD332;
             }
-            QPushButton#nav-active {
-                background-color: #333333;
-            }
-        """
-        )
-
-        layout = QVBoxLayout(sidebar)
-        layout.setSpacing(30)  # Spacing between sidebar elements
-        layout.setContentsMargins(0, 0, 0, 0)
-
-        # App Name Logo
-        logo_label = QLabel("MolecularUniverse")
-        logo_label.setStyleSheet(
-            "font-size: 24px; font-weight: bold; color: white; margin-bottom: 40px;"  # Logo styling
-        )
-        layout.addWidget(logo_label, alignment=Qt.AlignCenter)
-
-        # Profile section
-        profile_widget = QWidget()
-        profile_layout = QVBoxLayout(profile_widget)
-        profile_layout.setSpacing(10)  # Reduced spacing for better alignment
-        profile_layout.setAlignment(Qt.AlignCenter)
-
-        # Profile Picture
-        profile_pic_label = QLabel()
-        profile_pic_label.setFixedSize(
-            150, 200
-        )  # Adjusted to 150x150 for square fitting
-        profile_pic_label.setAlignment(Qt.AlignCenter)
-        pixmap = QPixmap(
-            "dan.jpeg"
-        )  # Ensure 'dan.jpeg' is in the same directory as 'gui.py'
-        if pixmap.isNull():
-            pixmap = QPixmap(150, 200)
-            pixmap.fill(Qt.gray)
-        else:
-            pixmap = pixmap.scaled(
-                150, 200, Qt.KeepAspectRatio, Qt.SmoothTransformation
-            )
-
-        # Set the pixmap without circular masking
-        profile_pic_label.setPixmap(pixmap)
-        profile_pic_label.setStyleSheet(
-            "border-radius: 10px;"  # Optional: Add slight rounding without border
-        )
-
-        # User Name
-        user_name_label = QLabel("Dan Walsh")
-        user_name_label.setStyleSheet(
-            "font-size: 18px; color: white; font-weight: bold;"
-        )
-        user_name_label.setAlignment(Qt.AlignCenter)
-
-        # Edit Button
-        edit_button = QPushButton("Edit")
-        edit_button.setStyleSheet(
-            """
-            QPushButton {
-                background-color: transparent;
-                border: 1px solid #444;
-                padding: 8px 12px;  /* Button padding */
-                font-size: 14px;     /* Button font size */
-                border-radius: 6px;
-            }
-            QPushButton:hover {
-                background-color: #555555;
-            }
-        """
-        )
-
-        # Assemble profile layout: Image above Name
-        profile_layout.addWidget(profile_pic_label)
-        profile_layout.addWidget(user_name_label)
-        profile_layout.addWidget(edit_button, alignment=Qt.AlignCenter)
-        layout.addWidget(profile_widget)
-
-        # Navigation buttons
-        # Updated button labels with emojis and exact names
-        self.home_btn = QPushButton("🏠  Home")
-        self.rankings_btn = QPushButton("📊  Rankings")
-        self.future_schedule_btn = QPushButton("📅  Future Schedule")
-
-        # Set object names for styling
-        self.home_btn.setObjectName("nav-active")  # Set Home as active by default
-
-        # Connect buttons to methods
-        self.home_btn.clicked.connect(self.show_home)
-        self.rankings_btn.clicked.connect(self.show_rankings)
-        self.future_schedule_btn.clicked.connect(self.show_future_schedule)
-
-        layout.addWidget(self.home_btn)
-        layout.addWidget(self.rankings_btn)
-        layout.addWidget(self.future_schedule_btn)
-
-        # Add spacer to push logout and version to the bottom
-        layout.addStretch()
-
-        # Logout and version
-        logout_btn = QPushButton("⬅️  Logout")
-        logout_btn.setStyleSheet(
-            """
-            QPushButton {
-                background-color: transparent;
-                color: #888;
-                font-size: 14px;  /* Logout button font size */
-            }
-            QPushButton:hover {
-                color: #AAA;
-            }
-        """
-        )
-        layout.addWidget(logout_btn)
-
+        """)
+        logout_layout.addWidget(self.logout_btn)
+        
+        # Version Label
         version_label = QLabel("Version 0.1.1.0 (RC)")
-        version_label.setStyleSheet("color: #666; font-size: 12px; margin-top: 10px;")
-        version_label.setAlignment(Qt.AlignCenter)
-        layout.addWidget(version_label)
+        version_label.setStyleSheet("""
+            QLabel {
+                color: #666666;
+                font-size: 12px;
+                font-family: 'Segoe UI', Arial;
+                padding: 10px 25px;
+            }
+        """)
+        logout_layout.addWidget(version_label)
+        
+        sidebar_layout.addWidget(logout_container)
 
         return sidebar
 
     def create_home_page(self):
-        content_widget = QWidget()
-        content_widget.setStyleSheet("""
-            QWidget {
-                background-color: #F5F5F5;
-            }
-        """)
-
-        layout = QVBoxLayout(content_widget)
-        layout.setSpacing(20)
-        layout.setContentsMargins(30, 30, 30, 30)
-
-        # **Notification Banner**
-        self.notification_banner = QLabel()
-        self.notification_banner.setFixedHeight(50)
-        self.notification_banner.setStyleSheet("""
-            QLabel {
-                background-color: #7CD332;
-                color: white;
-                font-size: 18px;
-                padding: 10px;
-                border-radius: 8px;
-            }
-        """)
-        self.notification_banner.hide()  # Hidden by default
-        layout.addWidget(self.notification_banner)
-
-        # **Add CPU Units Given Boxes**
-        cpu_boxes_widget = QWidget()
-        cpu_boxes_layout = QVBoxLayout(cpu_boxes_widget)
-        cpu_boxes_layout.setAlignment(Qt.AlignCenter)
-        cpu_boxes_layout.setSpacing(20)
-
-        # Current CPU Power Units Given Box
-        self.current_cpu_box = QFrame()
-        self.current_cpu_box.setFixedSize(400, 150)
-        self.current_cpu_box.setStyleSheet("""
+        """
+        Create the home page widget
+        """
+        home_widget = QWidget()
+        layout = QVBoxLayout(home_widget)
+        layout.setAlignment(Qt.AlignCenter)
+        
+        # CPU Units Box Container
+        boxes_container = QWidget()
+        boxes_layout = QVBoxLayout(boxes_container)
+        boxes_layout.setSpacing(20)
+        
+        # Current CPU Power Units Box
+        current_cpu_box = QFrame()
+        current_cpu_box.setStyleSheet("""
             QFrame {
                 background-color: #1E1E1E;
-                border-radius: 20px;
+                border-radius: 10px;
+                padding: 20px;
+                min-width: 400px;
+            }
+            QLabel {
+                color: white;
             }
         """)
-        current_cpu_layout = QVBoxLayout(self.current_cpu_box)
-        current_cpu_label = QLabel("Current CPU Power Units Given")
-        current_cpu_label.setStyleSheet("color: white; font-size: 24px;")
-        self.current_cpu_value = QLabel("0 Units")
-        self.current_cpu_value.setStyleSheet("color: #7CD332; font-size: 48px; font-weight: bold;")
-        current_cpu_layout.addStretch()
-        current_cpu_layout.addWidget(current_cpu_label, alignment=Qt.AlignCenter)
-        current_cpu_layout.addWidget(self.current_cpu_value, alignment=Qt.AlignCenter)
-        current_cpu_layout.addStretch()
-
-        # Total CPU Units Given So Far Box
-        self.total_cpu_box = QFrame()
-        self.total_cpu_box.setFixedSize(350, 120)
-        self.total_cpu_box.setStyleSheet("""
+        current_cpu_layout = QVBoxLayout(current_cpu_box)
+        
+        current_label = QLabel("Current CPU Power Units Given")
+        current_label.setStyleSheet("font-size: 18px;")
+        self.current_units = QLabel("0 Units")
+        self.current_units.setStyleSheet("font-size: 36px; color: #7CD332; font-weight: bold;")
+        
+        current_cpu_layout.addWidget(current_label, alignment=Qt.AlignCenter)
+        current_cpu_layout.addWidget(self.current_units, alignment=Qt.AlignCenter)
+        
+        # Total CPU Units Box
+        total_cpu_box = QFrame()
+        total_cpu_box.setStyleSheet("""
             QFrame {
                 background-color: #333333;
-                border-radius: 20px;
+                border-radius: 10px;
+                padding: 20px;
+                min-width: 350px;
+            }
+            QLabel {
+                color: white;
             }
         """)
-        total_cpu_layout = QVBoxLayout(self.total_cpu_box)
-        total_cpu_label = QLabel("Total CPU Units Contributed")
-        total_cpu_label.setStyleSheet("color: white; font-size: 20px;")
-        self.total_cpu_value = QLabel("0 Units")
-        self.total_cpu_value.setStyleSheet("color: #FFD700; font-size: 36px; font-weight: bold;")
-        total_cpu_layout.addStretch()
-        total_cpu_layout.addWidget(total_cpu_label, alignment=Qt.AlignCenter)
-        total_cpu_layout.addWidget(self.total_cpu_value, alignment=Qt.AlignCenter)
-        total_cpu_layout.addStretch()
-
-        cpu_boxes_layout.addWidget(self.current_cpu_box)
-        cpu_boxes_layout.addWidget(self.total_cpu_box)
-
-        layout.addWidget(cpu_boxes_widget, alignment=Qt.AlignCenter)
-
-        # **Add Auto and Manual Buttons**
-        workflow_buttons_widget = QWidget()
-        workflow_buttons_layout = QHBoxLayout(workflow_buttons_widget)
-        workflow_buttons_layout.setAlignment(Qt.AlignCenter)
-        workflow_buttons_layout.setSpacing(40)
-
-        # Auto Button
-        self.auto_button = QPushButton("Auto Mode")
-        self.auto_button.setFixedSize(180, 60)
-        self.auto_button.setStyleSheet("""
+        total_cpu_layout = QVBoxLayout(total_cpu_box)
+        
+        total_label = QLabel("Total CPU Units Contributed")
+        total_label.setStyleSheet("font-size: 16px;")
+        self.total_units = QLabel("0 Units")
+        self.total_units.setStyleSheet("font-size: 28px; color: #FFD700; font-weight: bold;")
+        
+        total_cpu_layout.addWidget(total_label, alignment=Qt.AlignCenter)
+        total_cpu_layout.addWidget(self.total_units, alignment=Qt.AlignCenter)
+        
+        # Add boxes to container
+        boxes_layout.addWidget(current_cpu_box, alignment=Qt.AlignCenter)
+        boxes_layout.addWidget(total_cpu_box, alignment=Qt.AlignCenter)
+        
+        # Mode Buttons
+        buttons_container = QWidget()
+        buttons_layout = QHBoxLayout(buttons_container)
+        buttons_layout.setSpacing(20)
+        
+        auto_mode_btn = QPushButton("Auto Mode")
+        auto_mode_btn.setStyleSheet("""
             QPushButton {
                 background-color: #7CD332;
-                border-radius: 30px;
                 color: white;
-                font-size: 20px;
-                font-weight: bold;
+                border: none;
+                padding: 10px 20px;
+                border-radius: 5px;
+                font-size: 16px;
+                min-width: 150px;
             }
             QPushButton:hover {
-                background-color: #6BC22B;
+                background-color: #6BB22E;
             }
         """)
-        self.auto_button.clicked.connect(self.start_auto_mode)
-
-        # Manual Button
-        self.manual_button = QPushButton("Manual Mode")
-        self.manual_button.setFixedSize(180, 60)
-        self.manual_button.setStyleSheet("""
+        
+        manual_mode_btn = QPushButton("Manual Mode")
+        manual_mode_btn.setStyleSheet("""
             QPushButton {
                 background-color: #FFA500;
-                border-radius: 30px;
                 color: white;
-                font-size: 20px;
-                font-weight: bold;
+                border: none;
+                padding: 10px 20px;
+                border-radius: 5px;
+                font-size: 16px;
+                min-width: 150px;
             }
             QPushButton:hover {
-                background-color: #E59400;
+                background-color: #E69500;
             }
         """)
-        self.manual_button.clicked.connect(self.start_manual_mode)
-
-        workflow_buttons_layout.addWidget(self.auto_button)
-        workflow_buttons_layout.addWidget(self.manual_button)
-
-        layout.addWidget(workflow_buttons_widget, alignment=Qt.AlignCenter)
-
-        # Spacer to push content to the top
-        layout.addStretch()
-
-        # **Timers and State Variables**
-        self.cpu_usage_timer = QTimer()
-        self.cpu_usage_timer.timeout.connect(self.update_cpu_usage)
-        self.cpu_usage_level = 0  # Simulated CPU usage level
-
-        self.manual_mode_active = False  # Track manual mode state
-
-        return content_widget
-
-    def start_auto_mode(self):
-        # Display a banner that Auto Mode has started
-        self.notification_banner.setText("Auto Mode has started.")
-        self.notification_banner.setStyleSheet("""
-            QLabel {
-                background-color: #7CD332;
-                color: white;
-                font-size: 18px;
-                padding: 10px;
-                border-radius: 8px;
-            }
-        """)
-        self.notification_banner.show()
-
-        # Hide the banner after 3 seconds
-        QTimer.singleShot(3000, self.notification_banner.hide)
-
-        # Start updating CPU usage
-        self.cpu_usage_timer.start(1000)  # Update every second
-
-    def start_manual_mode(self):
-        if not self.manual_mode_active:
-            # Change button to Stop
-            self.manual_button.setText("Stop")
-            self.manual_button.setStyleSheet("""
-                QPushButton {
-                    background-color: #D9534F;
-                    border-radius: 30px;
-                    color: white;
-                    font-size: 20px;
-                    font-weight: bold;
-                }
-                QPushButton:hover {
-                    background-color: #C9302C;
-                }
-            """)
-            self.manual_mode_active = True
-
-            # Display a banner
-            self.notification_banner.setText("Manual Mode has started.")
-            self.notification_banner.setStyleSheet("""
-                QLabel {
-                    background-color: #FFA500;
-                    color: white;
-                    font-size: 18px;
-                    padding: 10px;
-                    border-radius: 8px;
-                }
-            """)
-            self.notification_banner.show()
-            QTimer.singleShot(3000, self.notification_banner.hide)
-
-            # Start updating CPU usage
-            self.cpu_usage_timer.start(1000)  # Update every second
-        else:
-            # Change button back to Manual Mode
-            self.manual_button.setText("Manual Mode")
-            self.manual_button.setStyleSheet("""
-                QPushButton {
-                    background-color: #FFA500;
-                    border-radius: 30px;
-                    color: white;
-                    font-size: 20px;
-                    font-weight: bold;
-                }
-                QPushButton:hover {
-                    background-color: #E59400;
-                }
-            """)
-            self.manual_mode_active = False
-
-            # Display a banner
-            self.notification_banner.setText("Manual Mode has stopped.")
-            self.notification_banner.setStyleSheet("""
-                QLabel {
-                    background-color: #D9534F;
-                    color: white;
-                    font-size: 18px;
-                    padding: 10px;
-                    border-radius: 8px;
-                }
-            """)
-            self.notification_banner.show()
-            QTimer.singleShot(3000, self.notification_banner.hide)
-
-            # Stop updating CPU usage
-            self.cpu_usage_timer.stop()
-
-    def update_cpu_usage(self):
-        # Simulate CPU usage level change
-        self.cpu_usage_level = random.randint(0, 100)
-        self.current_cpu_value.setText(f"{self.cpu_usage_level} Units")
-
-        # Change color based on CPU usage level
-        if self.cpu_usage_level < 30:
-            color = "#7CD332"  # Green
-        elif self.cpu_usage_level < 60:
-            color = "#FFD700"  # Gold
-        elif self.cpu_usage_level < 90:
-            color = "#FFA500"  # Orange
-        else:
-            color = "#D9534F"  # Red
-
-        self.current_cpu_value.setStyleSheet(f"color: {color}; font-size: 48px; font-weight: bold;")
-
-        # Update total CPU units contributed
-        total_units = int(self.total_cpu_value.text().split()[0]) + self.cpu_usage_level
-        self.total_cpu_value.setText(f"{total_units} Units")
+        
+        buttons_layout.addWidget(auto_mode_btn)
+        buttons_layout.addWidget(manual_mode_btn)
+        
+        # Add all components to main layout
+        layout.addWidget(boxes_container)
+        layout.addWidget(buttons_container)
+        
+        return home_widget
 
     def create_rankings_page(self):
         rankings_widget = QWidget()
@@ -1391,54 +1261,26 @@ class ModernMolecularGUI(QMainWindow):
 
     def show_home(self):
         self.stacked_widget.setCurrentWidget(self.home_page)
-        self.update_nav_buttons(active_button=self.home_btn)
+        self.update_nav_buttons(self.home_btn)
 
     def show_rankings(self):
         self.stacked_widget.setCurrentWidget(self.rankings_page)
-        self.update_nav_buttons(active_button=self.rankings_btn)
+        self.update_nav_buttons(self.rankings_btn)
 
     def show_future_schedule(self):
         self.stacked_widget.setCurrentWidget(self.future_schedule_page)
-        self.update_nav_buttons(active_button=self.future_schedule_btn)
+        self.update_nav_buttons(self.future_schedule_btn)
 
     def update_nav_buttons(self, active_button):
-        # Reset all buttons
-        for btn in [self.home_btn, self.rankings_btn, self.future_schedule_btn]:
-            btn.setObjectName("")
-            btn.setStyleSheet(
-                """
-                QPushButton {
-                    text-align: left;
-                    padding: 15px;
-                    margin: 6px 0;
-                    color: white;
-                    border-radius: 8px;
-                    font-size: 16px;
-                    font-weight: 500;
-                    background-color: #1E1E1E;
-                }
-                QPushButton:hover {
-                    background-color: #333333;
-                }
-            """
-            )
-
-        # Highlight the active button
-        active_button.setObjectName("nav-active")
-        active_button.setStyleSheet(
-            """
-            QPushButton#nav-active {
-                background-color: #333333;
-                text-align: left;
-                padding: 15px;
-                margin: 6px 0;
-                color: white;
-                border-radius: 8px;
-                font-size: 16px;
-                font-weight: 500;
-            }
         """
-        )
+        Update the active state of navigation buttons with improved visual feedback
+        """
+        nav_buttons = [self.home_btn, self.rankings_btn, self.future_schedule_btn]
+        
+        for btn in nav_buttons:
+            btn.setProperty("Active", btn == active_button)
+            btn.style().unpolish(btn)
+            btn.style().polish(btn)
 
     def filter_table(self):
         """
