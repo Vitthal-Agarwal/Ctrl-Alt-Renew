@@ -17,8 +17,10 @@ from PyQt5.QtWidgets import (
     QRadioButton,
     QButtonGroup,
     QCheckBox,
+    QCalendarWidget,
+    QTimeEdit
 )
-from PyQt5.QtCore import Qt, QSize, QRect
+from PyQt5.QtCore import Qt, QSize, QRect, QDate, QTimer, QTime
 from PyQt5.QtGui import (
     QFont,
     QColor,
@@ -27,8 +29,297 @@ from PyQt5.QtGui import (
     QPixmap,
     QPainter,
     QBrush,
-    QPen,
+    QPen
 )
+import pandas as pd
+
+class SchedulerGUI(QWidget):
+    def __init__(self, future_df):
+        super().__init__()
+        self.future_df = future_df
+        self.current_week_start = self.future_df["Timestamp"].min().date()
+        self.current_time = QTime.currentTime()
+        self.initUI()
+
+    def initUI(self):
+        self.setStyleSheet("""
+            QWidget {
+                background-color: #F5F5F5;
+            }
+            QLabel {
+                color: #333;
+                font-size: 14px;
+            }
+            QPushButton {
+                border: none;
+                padding: 8px;
+                border-radius: 4px;
+                color: white;
+                background-color: #1E1E1E;
+            }
+            QPushButton:hover {
+                background-color: #333333;
+            }
+            QCalendarWidget {
+                background-color: white;
+                color: black;
+            }
+            QTableWidget {
+                background-color: white;
+                gridline-color: #E0E0E0;
+            }
+            QHeaderView::section {
+                background-color: #F0F0F0;
+                padding: 6px;
+                border: none;
+                font-weight: bold;
+                color: #666;
+                font-size: 14px;
+            }
+            QTableWidget::item {
+                padding: 5px;
+                font-size: 14px;
+            }
+            QTimeEdit {
+                font-size: 14px;
+            }
+        """)
+
+        main_layout = QVBoxLayout()
+
+        # Top section - Automation Button
+        top_layout = QHBoxLayout()
+        self.automation_button = QPushButton("Starting Automation with Low Intensity")
+        self.automation_button.setFixedHeight(40)
+        self.automation_button.setMinimumWidth(400)
+        self.automation_button.setFont(QFont('Arial', 10, QFont.Bold))
+        self.automation_button.clicked.connect(self.toggle_automation)
+        top_layout.addStretch()
+        top_layout.addWidget(self.automation_button)
+        top_layout.addStretch()
+        main_layout.addLayout(top_layout)
+
+        # Content section
+        content_layout = QHBoxLayout()
+
+        # Left panel - Calendar and Controls
+        left_panel = QVBoxLayout()
+        self.calendar = QCalendarWidget()
+        self.calendar.setGridVisible(True)
+        self.calendar.selectionChanged.connect(self.show_schedule)
+        self.calendar.setStyleSheet("""
+            QCalendarWidget {
+                background-color: white;
+                color: black;
+            }
+            QCalendarWidget QToolButton {
+                color: black;
+                background-color: transparent;
+                border: none;
+            }
+            QCalendarWidget QMenu {
+                width: 150px;
+                left: 20px;
+                color: black;
+            }
+            QCalendarWidget QSpinBox {
+                width: 60px;
+                font-size: 12px;
+                color: black;
+            }
+            QCalendarWidget QTableView {
+                alternate-background-color: #F0F0F0;
+                gridline-color: #E0E0E0;
+            }
+            QCalendarWidget QTableView:selected {
+                background-color: #4CAF50;
+                color: white;
+            }
+        """)
+        left_panel.addWidget(self.calendar)
+
+        # Navigation buttons
+        nav_layout = QHBoxLayout()
+        self.prev_button = QPushButton("Previous Day")
+        self.next_button = QPushButton("Next Day")
+        self.prev_button.clicked.connect(self.previous_day)
+        self.next_button.clicked.connect(self.next_day)
+        nav_layout.addWidget(self.prev_button)
+        nav_layout.addWidget(self.next_button)
+        left_panel.addLayout(nav_layout)
+
+        # Time control
+        time_layout = QHBoxLayout()
+        time_layout.addWidget(QLabel("Current Time:"))
+        self.time_edit = QTimeEdit(self.current_time)
+        self.time_edit.setDisplayFormat("HH:mm")
+        self.time_edit.timeChanged.connect(self.update_current_time)
+        time_layout.addWidget(self.time_edit)
+        left_panel.addLayout(time_layout)
+
+        content_layout.addLayout(left_panel)
+
+        # Right panel - Schedule Table
+        right_panel = QVBoxLayout()
+        self.table = QTableWidget()
+        self.table.setStyleSheet("""
+            QTableWidget {
+                background-color: white;
+                gridline-color: #E0E0E0;
+            }
+            QHeaderView::section {
+                background-color: #F0F0F0;
+                padding: 6px;
+                border: none;
+                font-weight: bold;
+                color: #666;
+                font-size: 14px;
+            }
+            QTableWidget::item {
+                padding: 5px;
+                font-size: 14px;
+            }
+        """)
+        right_panel.addWidget(self.table)
+        content_layout.addLayout(right_panel)
+
+        main_layout.addLayout(content_layout)
+        self.setLayout(main_layout)
+
+        self.setup_calendar()
+        self.show_schedule()
+
+        # Timer to update button state
+        self.timer = QTimer(self)
+        self.timer.timeout.connect(self.update_button_state)
+        self.timer.start(1000)
+
+    def setup_calendar(self):
+        min_date = self.future_df["Timestamp"].min().date()
+        max_date = self.future_df["Timestamp"].max().date()
+        self.calendar.setMinimumDate(QDate(min_date))
+        self.calendar.setMaximumDate(QDate(max_date))
+        self.calendar.setSelectedDate(QDate(self.current_week_start))
+
+    def previous_day(self):
+        current_date = self.calendar.selectedDate()
+        new_date = current_date.addDays(-1)
+        if new_date >= self.calendar.minimumDate():
+            self.calendar.setSelectedDate(new_date)
+
+    def next_day(self):
+        current_date = self.calendar.selectedDate()
+        new_date = current_date.addDays(1)
+        if new_date <= self.calendar.maximumDate():
+            self.calendar.setSelectedDate(new_date)
+
+    def show_schedule(self):
+        selected_date = self.calendar.selectedDate().toPyDate()
+        day_df = self.future_df[self.future_df["Timestamp"].dt.date == selected_date]
+
+        self.table.clear()
+        self.table.setRowCount(len(day_df))
+        self.table.setColumnCount(4)
+        self.table.setHorizontalHeaderLabels(
+            ["Start Time", "End Time", "CPU Usage Level", "Calc Intensity"]
+        )
+
+        for idx, row in day_df.reset_index().iterrows():
+            start_time = row["Timestamp"].strftime("%H:%M")
+            end_time = (row["Timestamp"] + pd.Timedelta(minutes=15)).strftime("%H:%M")
+            usage_level = row["Predicted_Status_Label"]
+            predicted_status = row["Predicted_Status"]
+
+            if predicted_status == 0:
+                intensity = "HIGH"
+                color = QColor(50, 205, 50)  # Green
+            elif predicted_status == 1:
+                intensity = "MEDIUM"
+                color = QColor(255, 215, 0)  # Gold
+            elif predicted_status == 2:
+                intensity = "LOW"
+                color = QColor(255, 140, 0)  # Orange
+            else:
+                intensity = "NONE"
+                color = QColor(178, 34, 34)  # Dark Red
+
+            for col, value in enumerate([start_time, end_time, usage_level, intensity]):
+                item = QTableWidgetItem(value)
+                item.setBackground(color)
+                item.setTextAlignment(Qt.AlignCenter)
+                self.table.setItem(idx, col, item)
+
+        self.table.resizeColumnsToContents()
+        self.table.horizontalHeader().setSectionResizeMode(QHeaderView.Stretch)
+
+    def update_current_time(self, time):
+        self.current_time = time
+        self.update_button_state()
+
+    def update_button_state(self):
+        selected_date = self.calendar.selectedDate().toPyDate()
+        current_datetime = pd.Timestamp.combine(
+            selected_date, self.current_time.toPyTime()
+        )
+
+        try:
+            row = self.future_df[self.future_df["Timestamp"] <= current_datetime].iloc[-1]
+            predicted_status = row["Predicted_Status"]
+
+            if predicted_status == 0:
+                text = "Starting Automation with High Intensity"
+                color = "#32CD32"  # Lime Green
+                text_color = "black"
+            elif predicted_status == 1:
+                text = "Starting Automation with Medium Intensity"
+                color = "#FFD700"  # Gold
+                text_color = "black"
+            elif predicted_status == 2:
+                text = "Starting Automation with Low Intensity"
+                color = "#FFA500"  # Orange
+                text_color = "black"
+            else:
+                text = "Stop Automation due to High Usage"
+                color = "#B22222"  # Firebrick
+                text_color = "white"
+
+            self.automation_button.setText(text)
+            self.automation_button.setStyleSheet(f"""
+                QPushButton {{
+                    background-color: {color};
+                    color: {text_color};
+                    border-radius: 5px;
+                    padding: 8px;
+                    border: none;
+                }}
+                QPushButton:hover {{
+                    background-color: {self.adjust_color(color)};
+                }}
+            """)
+        except IndexError:
+            # Handle case where no rows are present
+            self.automation_button.setText("No Automation Scheduled")
+            self.automation_button.setStyleSheet("""
+                QPushButton {
+                    background-color: #808080;  /* Gray */
+                    color: white;
+                    border-radius: 5px;
+                    padding: 8px;
+                    border: none;
+                }
+                QPushButton:hover {
+                    background-color: #696969;
+                }
+            """)
+
+    def adjust_color(self, hex_color):
+        # Darken the color for hover effect
+        color = QColor(hex_color)
+        h, s, v, a = color.getHsv()
+        return QColor.fromHsv(h, s, int(v * 0.8), a).name()
+
+    def toggle_automation(self):
+        print(f"Automation {self.automation_button.text()} clicked")
 
 
 class ModernMolecularGUI(QMainWindow):
@@ -44,7 +335,7 @@ class ModernMolecularGUI(QMainWindow):
         self.setStyleSheet(
             """
             QMainWindow {
-                background-color: white;
+                background-color: #F5F5F5;
             }
             QLabel {
                 color: #333;
@@ -54,12 +345,14 @@ class ModernMolecularGUI(QMainWindow):
                 padding: 8px;
                 border-radius: 4px;
                 color: white;
+                background-color: #1E1E1E;
             }
             QPushButton:hover {
-                background-color: #404040;
+                background-color: #333333;
             }
             QRadioButton {
                 font-size: 16px;
+                color: white;
             }
             QCheckBox::indicator {
                 width: 40px;
@@ -112,19 +405,20 @@ class ModernMolecularGUI(QMainWindow):
                 background-color: #1E1E1E;
                 min-width: 300px;  /* Sidebar width */
                 max-width: 300px;
-                padding: 20px;     /* Sidebar padding */
+                padding: 30px;     /* Sidebar padding */
             }
             QLabel {
                 color: white;
             }
             QPushButton {
                 text-align: left;
-                padding: 12px;          /* Button padding */
-                margin: 4px 0;          /* Button margin */
+                padding: 15px;          /* Button padding */
+                margin: 6px 0;          /* Button margin */
                 color: white;
                 border-radius: 8px;
                 font-size: 16px;        /* Button font size */
                 font-weight: 500;       /* Button font weight */
+                background-color: #1E1E1E;
             }
             QPushButton:hover {
                 background-color: #333333;
@@ -136,7 +430,7 @@ class ModernMolecularGUI(QMainWindow):
         )
 
         layout = QVBoxLayout(sidebar)
-        layout.setSpacing(24)  # Spacing between sidebar elements
+        layout.setSpacing(30)  # Spacing between sidebar elements
         layout.setContentsMargins(0, 0, 0, 0)
 
         # App Name Logo
@@ -149,24 +443,20 @@ class ModernMolecularGUI(QMainWindow):
         # Profile section
         profile_widget = QWidget()
         profile_layout = QVBoxLayout(profile_widget)
-        profile_layout.setSpacing(8)  # Spacing between profile elements
+        profile_layout.setSpacing(10)  # Reduced spacing for better alignment
         profile_layout.setAlignment(Qt.AlignCenter)
 
         # Profile Picture
         profile_pic_label = QLabel()
-        profile_pic_label.setFixedSize(
-            150, 200
-        )  # Adjusted to 150x200 for better fitting
+        profile_pic_label.setFixedSize(150, 150)  # Adjusted to 150x150 for square fitting
         profile_pic_label.setAlignment(Qt.AlignCenter)
-        pixmap = QPixmap(
-            "dan.jpeg"
-        )  # Ensure 'dan.jpeg' is in the same directory as 'gui.py'
+        pixmap = QPixmap("dan.jpeg")  # Ensure 'dan.jpeg' is in the same directory as 'gui.py'
         if pixmap.isNull():
-            pixmap = QPixmap(150, 200)
+            pixmap = QPixmap(150, 150)
             pixmap.fill(Qt.gray)
         else:
             pixmap = pixmap.scaled(
-                150, 200, Qt.KeepAspectRatio, Qt.SmoothTransformation
+                150, 150, Qt.KeepAspectRatio, Qt.SmoothTransformation
             )
 
         # Set the pixmap without circular masking
@@ -200,13 +490,13 @@ class ModernMolecularGUI(QMainWindow):
         )
 
         # Assemble profile layout: Image above Name
-        profile_layout.addWidget(profile_pic_label, alignment=Qt.AlignCenter)
-        profile_layout.addWidget(user_name_label, alignment=Qt.AlignCenter)
+        profile_layout.addWidget(profile_pic_label)
+        profile_layout.addWidget(user_name_label)
         profile_layout.addWidget(edit_button, alignment=Qt.AlignCenter)
         layout.addWidget(profile_widget)
 
         # Navigation buttons
-        # Updated button labels with emojis
+        # Updated button labels with emojis and exact names
         self.home_btn = QPushButton("🏠  Home")
         self.rankings_btn = QPushButton("📊  Rankings")
         self.future_schedule_btn = QPushButton("📅  Future Schedule")
@@ -298,22 +588,9 @@ class ModernMolecularGUI(QMainWindow):
         return rankings_widget
 
     def create_future_schedule_page(self):
-        future_schedule_widget = QWidget()
-        future_schedule_widget.setStyleSheet(
-            """
-            QWidget {
-                background-color: #F5F5F5;
-            }
-        """
-        )
-        layout = QVBoxLayout(future_schedule_widget)
-        layout.setAlignment(Qt.AlignCenter)
-
-        label = QLabel("Future Schedule Page - Coming Soon!")
-        label.setStyleSheet("font-size: 24px; color: #666;")
-        layout.addWidget(label)
-
-        return future_schedule_widget
+        # Integrate SchedulerGUI into the Future Schedule page
+        schedule_widget = SchedulerGUI(self.future_df)
+        return schedule_widget
 
     def create_workflow_card(self):
         card = QFrame()
@@ -335,12 +612,13 @@ class ModernMolecularGUI(QMainWindow):
         title.setStyleSheet("color: white; font-size: 24px; font-weight: bold;")
         subtitle = QLabel("Choose your workflow mode")
         subtitle.setStyleSheet("color: #888; font-size: 16px;")
+        subtitle.setAlignment(Qt.AlignCenter)
 
         # Options: Auto and Manual
         options_widget = QWidget()
         options_layout = QHBoxLayout(options_widget)
         options_layout.setAlignment(Qt.AlignCenter)
-        options_layout.setSpacing(15)  # Spacing between options
+        options_layout.setSpacing(50)  # Spacing between options
 
         # Auto Option
         auto_widget = QWidget()
@@ -351,15 +629,7 @@ class ModernMolecularGUI(QMainWindow):
         auto_radio.setStyleSheet("color: white; font-size: 16px;")
         auto_radio.setChecked(True)  # Default selection
 
-        # Description for Auto
-        auto_desc = QLabel(
-            "Automated response generated by the simulation and scheduling."
-        )
-        auto_desc.setStyleSheet("color: #ccc; font-size: 14px; text-align: center;")
-        auto_desc.setWordWrap(True)
-
         auto_layout.addWidget(auto_radio)
-        auto_layout.addWidget(auto_desc)
 
         # Manual Option
         manual_widget = QWidget()
@@ -369,15 +639,7 @@ class ModernMolecularGUI(QMainWindow):
         manual_radio = QRadioButton("Manual")
         manual_radio.setStyleSheet("color: white; font-size: 16px;")
 
-        # Description for Manual
-        manual_desc = QLabel(
-            "Control the workflow manually with start and stop options."
-        )
-        manual_desc.setStyleSheet("color: #ccc; font-size: 14px; text-align: center;")
-        manual_desc.setWordWrap(True)
-
         manual_layout.addWidget(manual_radio)
-        manual_layout.addWidget(manual_desc)
 
         # Button Group to ensure only one is selected
         self.workflow_group = QButtonGroup()
@@ -647,6 +909,7 @@ class ModernMolecularGUI(QMainWindow):
                     border-radius: 8px;
                     font-size: 16px;
                     font-weight: 500;
+                    background-color: #1E1E1E;
                 }
                 QPushButton:hover {
                     background-color: #333333;
@@ -678,7 +941,7 @@ def start_app(future_df=None, computation_manager=None):
     # Set application-wide style
     app.setStyle("Fusion")
 
-    # Set dark theme palette
+    # Set palette to match the overall theme
     palette = QPalette()
     palette.setColor(QPalette.Window, QColor(245, 245, 245))
     palette.setColor(QPalette.WindowText, QColor(51, 51, 51))
@@ -701,4 +964,15 @@ def start_app(future_df=None, computation_manager=None):
 
 
 if __name__ == "__main__":
-    start_app()  # For testing purposes only
+    # Example DataFrame for testing purposes
+    data = {
+        "Timestamp": pd.date_range(start="2024-01-01 08:00", periods=100, freq='15T'),
+        "Predicted_Status": [0, 1, 2, 3] * 25,  # 0: Low, 1: Medium, 2: High, 3: Critical
+        "Predicted_Status_Label": ["Low", "Medium", "High", "Critical"] * 25
+    }
+    future_df = pd.DataFrame(data)
+
+    # Placeholder for computation_manager
+    computation_manager = None  # Replace with actual computation manager if available
+
+    start_app(future_df, computation_manager)  # For testing purposes only
