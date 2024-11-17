@@ -18,20 +18,12 @@ from PyQt5.QtWidgets import (
     QButtonGroup,
     QCheckBox,
     QCalendarWidget,
-    QTimeEdit
+    QTimeEdit,
 )
 from PyQt5.QtCore import Qt, QSize, QRect, QDate, QTimer, QTime
-from PyQt5.QtGui import (
-    QFont,
-    QColor,
-    QPalette,
-    QIcon,
-    QPixmap,
-    QPainter,
-    QBrush,
-    QPen
-)
+from PyQt5.QtGui import QFont, QColor, QPalette, QIcon, QPixmap, QPainter, QBrush, QPen
 import pandas as pd
+
 
 class SchedulerGUI(QWidget):
     def __init__(self, future_df):
@@ -42,7 +34,8 @@ class SchedulerGUI(QWidget):
         self.initUI()
 
     def initUI(self):
-        self.setStyleSheet("""
+        self.setStyleSheet(
+            """
             QWidget {
                 background-color: #F5F5F5;
             }
@@ -83,7 +76,8 @@ class SchedulerGUI(QWidget):
             QTimeEdit {
                 font-size: 14px;
             }
-        """)
+        """
+        )
 
         main_layout = QVBoxLayout()
 
@@ -92,7 +86,7 @@ class SchedulerGUI(QWidget):
         self.automation_button = QPushButton("Starting Automation with Low Intensity")
         self.automation_button.setFixedHeight(40)
         self.automation_button.setMinimumWidth(400)
-        self.automation_button.setFont(QFont('Arial', 10, QFont.Bold))
+        self.automation_button.setFont(QFont("Arial", 10, QFont.Bold))
         self.automation_button.clicked.connect(self.toggle_automation)
         top_layout.addStretch()
         top_layout.addWidget(self.automation_button)
@@ -107,7 +101,8 @@ class SchedulerGUI(QWidget):
         self.calendar = QCalendarWidget()
         self.calendar.setGridVisible(True)
         self.calendar.selectionChanged.connect(self.show_schedule)
-        self.calendar.setStyleSheet("""
+        self.calendar.setStyleSheet(
+            """
             QCalendarWidget {
                 background-color: white;
                 color: black;
@@ -135,7 +130,8 @@ class SchedulerGUI(QWidget):
                 background-color: #4CAF50;
                 color: white;
             }
-        """)
+        """
+        )
         left_panel.addWidget(self.calendar)
 
         # Navigation buttons
@@ -162,7 +158,8 @@ class SchedulerGUI(QWidget):
         # Right panel - Schedule Table
         right_panel = QVBoxLayout()
         self.table = QTableWidget()
-        self.table.setStyleSheet("""
+        self.table.setStyleSheet(
+            """
             QTableWidget {
                 background-color: white;
                 gridline-color: #E0E0E0;
@@ -179,7 +176,8 @@ class SchedulerGUI(QWidget):
                 padding: 5px;
                 font-size: 14px;
             }
-        """)
+        """
+        )
         right_panel.addWidget(self.table)
         content_layout.addLayout(right_panel)
 
@@ -263,7 +261,9 @@ class SchedulerGUI(QWidget):
         )
 
         try:
-            row = self.future_df[self.future_df["Timestamp"] <= current_datetime].iloc[-1]
+            row = self.future_df[self.future_df["Timestamp"] <= current_datetime].iloc[
+                -1
+            ]
             predicted_status = row["Predicted_Status"]
 
             if predicted_status == 0:
@@ -284,7 +284,8 @@ class SchedulerGUI(QWidget):
                 text_color = "white"
 
             self.automation_button.setText(text)
-            self.automation_button.setStyleSheet(f"""
+            self.automation_button.setStyleSheet(
+                f"""
                 QPushButton {{
                     background-color: {color};
                     color: {text_color};
@@ -295,11 +296,13 @@ class SchedulerGUI(QWidget):
                 QPushButton:hover {{
                     background-color: {self.adjust_color(color)};
                 }}
-            """)
+            """
+            )
         except IndexError:
             # Handle case where no rows are present
             self.automation_button.setText("No Automation Scheduled")
-            self.automation_button.setStyleSheet("""
+            self.automation_button.setStyleSheet(
+                """
                 QPushButton {
                     background-color: #808080;  /* Gray */
                     color: white;
@@ -310,7 +313,8 @@ class SchedulerGUI(QWidget):
                 QPushButton:hover {
                     background-color: #696969;
                 }
-            """)
+            """
+            )
 
     def adjust_color(self, hex_color):
         # Darken the color for hover effect
@@ -448,15 +452,19 @@ class ModernMolecularGUI(QMainWindow):
 
         # Profile Picture
         profile_pic_label = QLabel()
-        profile_pic_label.setFixedSize(150, 150)  # Adjusted to 150x150 for square fitting
+        profile_pic_label.setFixedSize(
+            150, 200
+        )  # Adjusted to 150x150 for square fitting
         profile_pic_label.setAlignment(Qt.AlignCenter)
-        pixmap = QPixmap("dan.jpeg")  # Ensure 'dan.jpeg' is in the same directory as 'gui.py'
+        pixmap = QPixmap(
+            "dan.jpeg"
+        )  # Ensure 'dan.jpeg' is in the same directory as 'gui.py'
         if pixmap.isNull():
-            pixmap = QPixmap(150, 150)
+            pixmap = QPixmap(150, 200)
             pixmap.fill(Qt.gray)
         else:
             pixmap = pixmap.scaled(
-                150, 150, Qt.KeepAspectRatio, Qt.SmoothTransformation
+                150, 200, Qt.KeepAspectRatio, Qt.SmoothTransformation
             )
 
         # Set the pixmap without circular masking
@@ -966,9 +974,10 @@ def start_app(future_df=None, computation_manager=None):
 if __name__ == "__main__":
     # Example DataFrame for testing purposes
     data = {
-        "Timestamp": pd.date_range(start="2024-01-01 08:00", periods=100, freq='15T'),
-        "Predicted_Status": [0, 1, 2, 3] * 25,  # 0: Low, 1: Medium, 2: High, 3: Critical
-        "Predicted_Status_Label": ["Low", "Medium", "High", "Critical"] * 25
+        "Timestamp": pd.date_range(start="2024-01-01 08:00", periods=100, freq="15T"),
+        "Predicted_Status": [0, 1, 2, 3]
+        * 25,  # 0: Low, 1: Medium, 2: High, 3: Critical
+        "Predicted_Status_Label": ["Low", "Medium", "High", "Critical"] * 25,
     }
     future_df = pd.DataFrame(data)
 
