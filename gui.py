@@ -19,6 +19,7 @@ from PyQt5.QtWidgets import (
     QCheckBox,
     QCalendarWidget,
     QTimeEdit,
+    QLineEdit,
 )
 from PyQt5.QtCore import Qt, QSize, QRect, QDate, QTimer, QTime
 from PyQt5.QtGui import QFont, QColor, QPalette, QIcon, QPixmap, QPainter, QBrush, QPen
@@ -784,9 +785,65 @@ class ModernMolecularGUI(QMainWindow):
         layout = QVBoxLayout(rankings_widget)
         layout.setAlignment(Qt.AlignCenter)
 
-        label = QLabel("Rankings Page - Coming Soon!")
-        label.setStyleSheet("font-size: 24px; color: #666;")
-        layout.addWidget(label)
+        # Search Bar
+        search_layout = QHBoxLayout()
+        search_label = QLabel("Search by full name, nickname or email:")
+        search_label.setStyleSheet("font-size: 16px; color: #333;")
+        self.search_input = QLineEdit()
+        self.search_input.setPlaceholderText("Type here...")
+        self.search_input.setStyleSheet("padding: 8px; font-size: 14px;")
+        search_layout.addWidget(search_label)
+        search_layout.addWidget(self.search_input)
+
+        layout.addLayout(search_layout)
+
+        # Rankings Table
+        self.rankings_table = QTableWidget()
+        self.rankings_table.setColumnCount(6)
+        self.rankings_table.setHorizontalHeaderLabels(
+            ["Position", "Full Name", "Email", "Nickname", "Score", "Molecules"]
+        )
+        self.rankings_table.setStyleSheet(
+            """
+            QTableWidget {
+                background-color: white;
+                gridline-color: #E0E0E0;
+            }
+            QHeaderView::section {
+                background-color: #F0F0F0;
+                padding: 6px;
+                border: none;
+                font-weight: bold;
+                color: #666;
+                font-size: 14px;
+            }
+            QTableWidget::item {
+                padding: 5px;
+                font-size: 14px;
+            }
+        """
+        )
+
+        # Sample Data (Replace with actual data)
+        sample_data = [
+            [1, "Andre Neto Win", "andre.neto.c.w@conceptpatech.com", "Neto Win", 132383, 360],
+            [2, "Dan Hannah", "dan.hannah@ses.ai", "dan.hannah", 126554, 199],
+            [3, "Roberta QATest", "robertaqatest@gmail.com", "qatest", 109424, 170],
+            [4, "Cristiano Moraes", "cristianomoraescar@gmail.com", "ccmoraes", 81421, 121],
+            [5, "Daniel Walsh", "danwalshhh@gmail.com", "Dan", 50477, 91],
+            [6, "Leandro Barbosa", "leandro@fanhero.com", "leeaandrob", 36100, 60],
+            [7, "Raquel Comunale", "comunale.qa@gmail.com", "comunale.qa", 24005, 41],
+            [8, "Raul Burd", "raul@conceptpatech.com", "RB", 22928, 52],
+        ]
+
+        self.rankings_table.setRowCount(len(sample_data))
+        for row_idx, row_data in enumerate(sample_data):
+            for col_idx, value in enumerate(row_data):
+                item = QTableWidgetItem(str(value))
+                item.setTextAlignment(Qt.AlignCenter)
+                self.rankings_table.setItem(row_idx, col_idx, item)
+
+        layout.addWidget(self.rankings_table)
 
         return rankings_widget
 
