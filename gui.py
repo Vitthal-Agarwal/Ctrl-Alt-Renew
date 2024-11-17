@@ -335,7 +335,7 @@ class ModernMolecularGUI(QMainWindow):
         super().__init__()
         self.future_df = future_df
         self.computation_manager = computation_manager
-        
+
         # Initialize data for leaderboards
         self.weekly_data = [
             [1, "Alice Smith", "alice@example.com", "Alice", 1500, 100],
@@ -344,36 +344,51 @@ class ModernMolecularGUI(QMainWindow):
             [4, "David Wilson", "david@example.com", "David", 1200, 70],
             [5, "Eva Green", "eva@example.com", "Eva", 1100, 60],
         ]
-        
+
         self.all_time_data = [
-            [1, "Andre Neto Win", "andre.neto.c.w@conceptpatech.com", "Neto Win", 132383, 360],
+            [
+                1,
+                "Andre Neto Win",
+                "andre.neto.c.w@conceptpatech.com",
+                "Neto Win",
+                132383,
+                360,
+            ],
             [2, "Dan Hannah", "dan.hannah@ses.ai", "dan.hannah", 126554, 199],
             [3, "Roberta QATest", "robertaqatest@gmail.com", "qatest", 109424, 170],
-            [4, "Cristiano Moraes", "cristianomoraescar@gmail.com", "ccmoraes", 81421, 121],
+            [
+                4,
+                "Cristiano Moraes",
+                "cristianomoraescar@gmail.com",
+                "ccmoraes",
+                81421,
+                121,
+            ],
             [5, "Daniel Walsh", "danwalshhh@gmail.com", "Dan", 50477, 91],
             [6, "Leandro Barbosa", "leandro@fanhero.com", "leeaandrob", 36100, 60],
             [7, "Raquel Comunale", "comunale.qa@gmail.com", "comunale.qa", 24005, 41],
             [8, "Raul Burd", "raul@conceptpatech.com", "RB", 22928, 52],
             [9, "Sarah Chen", "sarah.chen@example.com", "SarahC", 21500, 48],
-        [10, "Michael Rodriguez", "mrodriguez@example.com", "MikeR", 20100, 45],
-        [11, "Emma Thompson", "emma.t@example.com", "EmmaT", 19500, 43],
-        [12, "James Wilson", "jwilson@example.com", "JWil", 18900, 40],
-        [13, "Lisa Anderson", "lisa.a@example.com", "LisaA", 17800, 38],
-        [14, "Kevin Park", "kpark@example.com", "KPark", 16700, 35],
-        [15, "Maria Garcia", "mgarcia@example.com", "MariaG", 15600, 33],
-        [16, "Thomas Brown", "tbrown@example.com", "TomB", 14500, 30],
-        [17, "Anna Kim", "akim@example.com", "AnnaK", 13400, 28],
-        [18, "Peter Zhang", "pzhang@example.com", "PeterZ", 12300, 25],
-        [19, "Sophie Martin", "smartin@example.com", "SophieM", 11200, 23],
-        [20, "David Lee", "dlee@example.com", "DaveL", 10100, 20],
+            [10, "Michael Rodriguez", "mrodriguez@example.com", "MikeR", 20100, 45],
+            [11, "Emma Thompson", "emma.t@example.com", "EmmaT", 19500, 43],
+            [12, "James Wilson", "jwilson@example.com", "JWil", 18900, 40],
+            [13, "Lisa Anderson", "lisa.a@example.com", "LisaA", 17800, 38],
+            [14, "Kevin Park", "kpark@example.com", "KPark", 16700, 35],
+            [15, "Maria Garcia", "mgarcia@example.com", "MariaG", 15600, 33],
+            [16, "Thomas Brown", "tbrown@example.com", "TomB", 14500, 30],
+            [17, "Anna Kim", "akim@example.com", "AnnaK", 13400, 28],
+            [18, "Peter Zhang", "pzhang@example.com", "PeterZ", 12300, 25],
+            [19, "Sophie Martin", "smartin@example.com", "SophieM", 11200, 23],
+            [20, "David Lee", "dlee@example.com", "DaveL", 10100, 20],
         ]
-        
+
         self.initUI()
 
     def initUI(self):
         self.setWindowTitle("Molecular Universe")
         self.showFullScreen()  # Make the application full screen
-        self.setStyleSheet("""
+        self.setStyleSheet(
+            """
             QMainWindow {
                 background-color: #F5F5F5;
             }
@@ -390,7 +405,8 @@ class ModernMolecularGUI(QMainWindow):
             QPushButton:hover {
                 background-color: #333333;
             }
-        """)
+        """
+        )
 
         # Create main widget and layout
         main_widget = QWidget()
@@ -422,17 +438,23 @@ class ModernMolecularGUI(QMainWindow):
 
     def update_period(self):
         selected_period = self.period_combo.currentText()
-        
+
         # Implement logic to filter data based on the selected period
         if selected_period == "Last 30 days":
             # Filter or modify self.all_time_data as needed
-            self.populate_table(self.rankings_table, self.all_time_data)  # Replace with actual filtering logic
+            self.populate_table(
+                self.rankings_table, self.all_time_data
+            )  # Replace with actual filtering logic
         elif selected_period == "Last 60 days":
             # Implement logic for Last 60 days
-            self.populate_table(self.rankings_table, self.all_time_data)  # Replace with actual filtering logic
+            self.populate_table(
+                self.rankings_table, self.all_time_data
+            )  # Replace with actual filtering logic
         elif selected_period == "All time":
             # Show all-time data
-            self.populate_table(self.rankings_table, self.all_time_data)  # Replace with actual filtering logic
+            self.populate_table(
+                self.rankings_table, self.all_time_data
+            )  # Replace with actual filtering logic
 
     def create_sidebar(self):
         sidebar = QFrame()
@@ -584,15 +606,16 @@ class ModernMolecularGUI(QMainWindow):
         home_widget = QWidget()
         main_layout = QVBoxLayout(home_widget)
         main_layout.setContentsMargins(0, 50, 0, 50)
-        
+
         # Center container
         center_container = QWidget()
         center_layout = QVBoxLayout(center_container)
         center_layout.setAlignment(Qt.AlignCenter)
-        
+
         # Workflow container
         workflow_container = QFrame()
-        workflow_container.setStyleSheet("""
+        workflow_container.setStyleSheet(
+            """
             QFrame {
                 background-color: #1E1E1E;
                 border-radius: 20px;
@@ -600,38 +623,34 @@ class ModernMolecularGUI(QMainWindow):
                 max-width: 480px;
                 padding: 35px;
             }
-        """)
+        """
+        )
         workflow_layout = QVBoxLayout(workflow_container)
         workflow_layout.setSpacing(25)
-        
-        # Add Dashboard Heading
-        dashboard_title = QLabel("Calculation Workflow")
+
+        # Add Dashboard Heading with better centering
+        dashboard_title = QLabel("User Dashboard")
         dashboard_title.setStyleSheet("""
             QLabel {
                 color: white;
                 font-size: 24px;
                 font-weight: bold;
                 font-family: 'Segoe UI', Arial;
-                margin-bottom: 10px;
+                padding: 0 0 20px 0;  /* Added bottom padding */
+                width: 100%;         /* Ensure full width */
             }
         """)
-        dashboard_title.setAlignment(Qt.AlignCenter)
+        dashboard_title.setAlignment(Qt.AlignCenter)  # Center align the text
         
-        # Add subtitle
-        subtitle = QLabel("The program will execute when your computer is idle")
-        subtitle.setStyleSheet("""
-            QLabel {
-                color: #888888;
-                font-size: 14px;
-                font-family: 'Segoe UI', Arial;
-                margin-bottom: 20px;
-            }
-        """)
-        subtitle.setAlignment(Qt.AlignCenter)
+        # Create a container for the title to ensure proper centering
+        title_container = QWidget()
+        title_layout = QHBoxLayout(title_container)
+        title_layout.setContentsMargins(0, 0, 0, 0)  # Remove margins
+        title_layout.addWidget(dashboard_title)
         
-        workflow_layout.addWidget(dashboard_title)
-        workflow_layout.addWidget(subtitle)
-        
+        # Add title container to workflow layout
+        workflow_layout.addWidget(title_container)
+
         # Stats boxes - KEY MEASUREMENTS
         stats_box_style = """
             QFrame {
@@ -641,70 +660,79 @@ class ModernMolecularGUI(QMainWindow):
                 margin: 5px 0px;     /* Small vertical margin */
             }
         """
-        
+
         # Current CPU Units Box
         current_cpu_box = QFrame()
         current_cpu_box.setStyleSheet(stats_box_style)
         current_cpu_layout = QVBoxLayout(current_cpu_box)
         current_cpu_layout.setSpacing(8)
-        
+
         current_label = QLabel("Current CPU Power Units Given")
-        current_label.setStyleSheet("""
+        current_label.setStyleSheet(
+            """
             font-size: 16px;
             color: #E0E0E0;
             font-family: 'Segoe UI', Arial;
-        """)
+        """
+        )
         current_label.setAlignment(Qt.AlignCenter)
-        
+
         self.current_units = QLabel("0 Units")
-        self.current_units.setStyleSheet("""
+        self.current_units.setStyleSheet(
+            """
             font-size: 42px;
             font-weight: bold;
             color: #7CD332;
             font-family: 'Segoe UI', Arial;
-        """)
+        """
+        )
         self.current_units.setAlignment(Qt.AlignCenter)
-        
+
         current_cpu_layout.addWidget(current_label)
         current_cpu_layout.addWidget(self.current_units)
-        
+
         # Total CPU Units Box
         total_cpu_box = QFrame()
         total_cpu_box.setStyleSheet(stats_box_style)
         total_cpu_layout = QVBoxLayout(total_cpu_box)
         total_cpu_layout.setSpacing(8)
-        
+
         total_label = QLabel("Total CPU Units Contributed")
-        total_label.setStyleSheet("""
+        total_label.setStyleSheet(
+            """
             font-size: 16px;
             color: #E0E0E0;
             font-family: 'Segoe UI', Arial;
-        """)
+        """
+        )
         total_label.setAlignment(Qt.AlignCenter)
-        
+
         self.total_units = QLabel("0 Units")
-        self.total_units.setStyleSheet("""
+        self.total_units.setStyleSheet(
+            """
             font-size: 42px;
             font-weight: bold;
             color: #FFD700;
             font-family: 'Segoe UI', Arial;
-        """)
+        """
+        )
         self.total_units.setAlignment(Qt.AlignCenter)
-        
+
         total_cpu_layout.addWidget(total_label)
         total_cpu_layout.addWidget(self.total_units)
-        
+
         # Mode Buttons Container
         buttons_container = QWidget()
         buttons_layout = QHBoxLayout(buttons_container)
         buttons_layout.setSpacing(15)
         buttons_layout.setContentsMargins(0, 15, 0, 0)
-        
+
         # Auto Mode Button
         auto_mode_btn = QPushButton("Auto Mode")
         auto_mode_btn.setCursor(Qt.PointingHandCursor)
         auto_mode_btn.setFixedSize(180, 40)
-        auto_mode_btn.setStyleSheet("""
+        auto_mode_btn.setStyleSheet(
+            """
             QPushButton {
                 background-color: #7CD332;
                 color: white;
@@ -717,13 +745,15 @@ class ModernMolecularGUI(QMainWindow):
             QPushButton:hover {
                 background-color: #6BB22E;
             }
-        """)
-        
+        """
+        )
+
         # Manual Mode Button
         manual_mode_btn = QPushButton("Manual Mode")
         manual_mode_btn.setCursor(Qt.PointingHandCursor)
         manual_mode_btn.setFixedSize(180, 40)
-        manual_mode_btn.setStyleSheet("""
+        manual_mode_btn.setStyleSheet(
+            """
             QPushButton {
                 background-color: #FFA500;
                 color: white;
@@ -736,35 +766,37 @@ class ModernMolecularGUI(QMainWindow):
             QPushButton:hover {
                 background-color: #E69500;
             }
-        """)
-        
+        """
+        )
+
         buttons_layout.addWidget(auto_mode_btn, alignment=Qt.AlignCenter)
         buttons_layout.addWidget(manual_mode_btn, alignment=Qt.AlignCenter)
-        
+
         # Add all elements to workflow container
         workflow_layout.addWidget(current_cpu_box)
         workflow_layout.addWidget(total_cpu_box)
         workflow_layout.addWidget(buttons_container)
-        
+
         # Add shadow effect
         shadow = QGraphicsDropShadowEffect()
         shadow.setBlurRadius(30)
         shadow.setColor(QColor(0, 0, 0, 60))
         shadow.setOffset(0, 5)
         workflow_container.setGraphicsEffect(shadow)
-        
+
         # Add workflow container to center layout
         center_layout.addWidget(workflow_container, alignment=Qt.AlignCenter)
-        
+
         # Add center container to main layout
         main_layout.addWidget(center_container)
-        
+
         return home_widget
 
     def start_auto_mode(self):
         # Display a banner that Auto Mode has started
         self.notification_banner.setText("Auto Mode has started.")
-        self.notification_banner.setStyleSheet("""
+        self.notification_banner.setStyleSheet(
+            """
             QLabel {
                 background-color: #7CD332;
                 color: white;
@@ -772,7 +804,8 @@ class ModernMolecularGUI(QMainWindow):
                 padding: 10px;
                 border-radius: 8px;
             }
-        """)
+        """
+        )
         self.notification_banner.show()
 
         # Hide the banner after 3 seconds
@@ -785,7 +818,8 @@ class ModernMolecularGUI(QMainWindow):
         if not self.manual_mode_active:
             # Change button to Stop
             self.manual_button.setText("Stop")
-            self.manual_button.setStyleSheet("""
+            self.manual_button.setStyleSheet(
+                """
                 QPushButton {
                     background-color: #D9534F;
                     border-radius: 30px;
@@ -796,12 +830,14 @@ class ModernMolecularGUI(QMainWindow):
                 QPushButton:hover {
                     background-color: #C9302C;
                 }
-            """)
+            """
+            )
             self.manual_mode_active = True
 
             # Display a banner
             self.notification_banner.setText("Manual Mode has started.")
-            self.notification_banner.setStyleSheet("""
+            self.notification_banner.setStyleSheet(
+                """
                 QLabel {
                     background-color: #FFA500;
                     color: white;
@@ -809,7 +845,8 @@ class ModernMolecularGUI(QMainWindow):
                     padding: 10px;
                     border-radius: 8px;
                 }
-            """)
+            """
+            )
             self.notification_banner.show()
             QTimer.singleShot(3000, self.notification_banner.hide)
 
@@ -818,7 +855,8 @@ class ModernMolecularGUI(QMainWindow):
         else:
             # Change button back to Manual Mode
             self.manual_button.setText("Manual Mode")
-            self.manual_button.setStyleSheet("""
+            self.manual_button.setStyleSheet(
+                """
                 QPushButton {
                     background-color: #FFA500;
                     border-radius: 30px;
@@ -829,12 +867,14 @@ class ModernMolecularGUI(QMainWindow):
                 QPushButton:hover {
                     background-color: #E59400;
                 }
-            """)
+            """
+            )
             self.manual_mode_active = False
 
             # Display a banner
             self.notification_banner.setText("Manual Mode has stopped.")
-            self.notification_banner.setStyleSheet("""
+            self.notification_banner.setStyleSheet(
+                """
                 QLabel {
                     background-color: #D9534F;
                     color: white;
@@ -842,7 +882,8 @@ class ModernMolecularGUI(QMainWindow):
                     padding: 10px;
                     border-radius: 8px;
                 }
-            """)
+            """
+            )
             self.notification_banner.show()
             QTimer.singleShot(3000, self.notification_banner.hide)
 
@@ -864,7 +905,9 @@ class ModernMolecularGUI(QMainWindow):
         else:
             color = "#D9534F"  # Red
 
-        self.current_cpu_value.setStyleSheet(f"color: {color}; font-size: 48px; font-weight: bold;")
+        self.current_cpu_value.setStyleSheet(
+            f"color: {color}; font-size: 48px; font-weight: bold;"
+        )
 
         # Update total CPU units contributed
         total_units = int(self.total_cpu_value.text().split()[0]) + self.cpu_usage_level
@@ -930,7 +973,7 @@ class ModernMolecularGUI(QMainWindow):
 
         # Header Section
         header_layout = QHBoxLayout()
-        
+
         # Search Section with improved styling
         search_label = QLabel("Search by full name, nickname or email:")
         search_label.setStyleSheet("font-size: 14px; font-weight: normal; color: #666;")
@@ -944,25 +987,25 @@ class ModernMolecularGUI(QMainWindow):
             pass
         # Connect the search signal
         self.search_input.textChanged.connect(self.filter_tables)
-        
+
         # Period Selection with improved styling
         period_label = QLabel("Period:")
         period_label.setStyleSheet("font-size: 14px; font-weight: normal; color: #666;")
         self.period_combo = QComboBox()
         self.period_combo.addItems(["Last 30 days", "Last 60 days", "All time"])
-        
+
         header_layout.addWidget(search_label)
         header_layout.addWidget(self.search_input)
         header_layout.addStretch()
         header_layout.addWidget(period_label)
         header_layout.addWidget(self.period_combo)
-        
+
         layout.addLayout(header_layout)
 
         # Weekly Leaderboard with more sample data
         weekly_label = QLabel("Weekly Leaderboard 🥇")
         layout.addWidget(weekly_label)
-        
+
         self.weekly_table = self.create_leaderboard_table()
         self.weekly_data = [
             [1, "Alice Smith", "alice@example.com", "Alice", 1500, 100],
@@ -982,7 +1025,7 @@ class ModernMolecularGUI(QMainWindow):
         # All-Time Leaderboard with existing data
         all_time_label = QLabel("All-Time Leaderboard 🏆")
         layout.addWidget(all_time_label)
-        
+
         self.rankings_table = self.create_leaderboard_table()
         # Keep your existing all_time_data
         self.populate_table(self.rankings_table, self.all_time_data)
@@ -995,7 +1038,7 @@ class ModernMolecularGUI(QMainWindow):
         Enhanced filter function for both tables
         """
         search_text = search_text.lower().strip()
-        
+
         # Helper function to check if row matches search criteria
         def matches_search(row_data):
             # Check full name (index 1)
@@ -1010,13 +1053,15 @@ class ModernMolecularGUI(QMainWindow):
             return False
 
         # Filter weekly table
-        if hasattr(self, 'weekly_table') and hasattr(self, 'weekly_data'):
+        if hasattr(self, "weekly_table") and hasattr(self, "weekly_data"):
             filtered_weekly = [row for row in self.weekly_data if matches_search(row)]
             self.update_table_data(self.weekly_table, filtered_weekly)
 
         # Filter all-time table
-        if hasattr(self, 'rankings_table') and hasattr(self, 'all_time_data'):
-            filtered_alltime = [row for row in self.all_time_data if matches_search(row)]
+        if hasattr(self, "rankings_table") and hasattr(self, "all_time_data"):
+            filtered_alltime = [
+                row for row in self.all_time_data if matches_search(row)
+            ]
             self.update_table_data(self.rankings_table, filtered_alltime)
 
     def update_table_data(self, table, filtered_data):
@@ -1024,12 +1069,12 @@ class ModernMolecularGUI(QMainWindow):
         Update table with filtered data while maintaining styling
         """
         table.setRowCount(len(filtered_data))
-        
+
         for row_idx, row_data in enumerate(filtered_data):
             for col_idx, value in enumerate(row_data):
                 item = QTableWidgetItem(str(value))
                 item.setTextAlignment(Qt.AlignCenter)
-                
+
                 # Apply column-specific styling
                 if col_idx == 0:  # Position
                     item.setForeground(QColor("#666666"))
@@ -1049,11 +1094,11 @@ class ModernMolecularGUI(QMainWindow):
                 elif col_idx == 2:  # Email
                     item.setTextAlignment(Qt.AlignLeft | Qt.AlignVCenter)
                     item.setForeground(QColor("#666666"))
-                
+
                 # Make items non-editable
                 item.setFlags(item.flags() & ~Qt.ItemIsEditable)
                 table.setItem(row_idx, col_idx, item)
-            
+
             # Set row height
             table.setRowHeight(row_idx, 40)
 
@@ -1065,7 +1110,7 @@ class ModernMolecularGUI(QMainWindow):
         Adjust column widths for optimal display
         """
         header = table.horizontalHeader()
-        
+
         # Set specific column widths and behaviors
         column_configs = {
             0: ("Position", 80, QHeaderView.Fixed),
@@ -1073,9 +1118,9 @@ class ModernMolecularGUI(QMainWindow):
             2: ("Email", 250, QHeaderView.Stretch),
             3: ("Nickname", 120, QHeaderView.Fixed),
             4: ("Score", 100, QHeaderView.Fixed),
-            5: ("Molecules", 100, QHeaderView.Fixed)
+            5: ("Molecules", 100, QHeaderView.Fixed),
         }
-        
+
         for col, (name, width, resize_mode) in column_configs.items():
             header.setSectionResizeMode(col, resize_mode)
             if resize_mode == QHeaderView.Fixed:
@@ -1087,14 +1132,17 @@ class ModernMolecularGUI(QMainWindow):
         """
         table = QTableWidget()
         table.setColumnCount(6)
-        table.setHorizontalHeaderLabels(["Position", "Full Name", "Email", "Nickname", "Score", "Molecules"])
-        
+        table.setHorizontalHeaderLabels(
+            ["Position", "Full Name", "Email", "Nickname", "Score", "Molecules"]
+        )
+
         # Table properties
         table.setShowGrid(False)
         table.setAlternatingRowColors(True)
         table.verticalHeader().setVisible(False)
         table.horizontalHeader().setHighlightSections(False)
-        table.setStyleSheet("""
+        table.setStyleSheet(
+            """
             QTableWidget {
                 background-color: white;
                 alternate-background-color: #F8F8F8;
@@ -1109,11 +1157,12 @@ class ModernMolecularGUI(QMainWindow):
                 background-color: #F0F7FF;
                 color: black;
             }
-        """)
-        
+        """
+        )
+
         # Initialize column adjustments
         self.adjust_table_columns(table)
-        
+
         return table
 
     def populate_table(self, table, data):
@@ -1125,7 +1174,7 @@ class ModernMolecularGUI(QMainWindow):
             for col_idx, value in enumerate(row_data):
                 item = QTableWidgetItem(str(value))
                 item.setTextAlignment(Qt.AlignCenter)
-                
+
                 # Style specific columns
                 if col_idx == 0:  # Position column
                     item.setForeground(QColor("#666666"))
@@ -1136,10 +1185,10 @@ class ModernMolecularGUI(QMainWindow):
                 elif col_idx == 5:  # Molecules column
                     item.setForeground(QColor("#28A745"))
                     item.setFont(QFont("Arial", 10))
-                
+
                 item.setFlags(item.flags() & ~Qt.ItemIsEditable)
                 table.setItem(row_idx, col_idx, item)
-            
+
             # Set row height
             table.setRowHeight(row_idx, 40)
 
@@ -1495,29 +1544,33 @@ class ModernMolecularGUI(QMainWindow):
         Filter both tables based on search input
         """
         search_text = self.search_input.text().lower()
-        
+
         # Filter Weekly Table
         filtered_weekly_data = []
         for row in self.weekly_data:
-            if any(search_text in str(item).lower() for item in row[1:4]):  # Search in name, email, and nickname
+            if any(
+                search_text in str(item).lower() for item in row[1:4]
+            ):  # Search in name, email, and nickname
                 filtered_weekly_data.append(row)
-        
+
         # Filter All-Time Table
         filtered_all_time_data = []
         for row in self.all_time_data:
-            if any(search_text in str(item).lower() for item in row[1:4]):  # Search in name, email, and nickname
+            if any(
+                search_text in str(item).lower() for item in row[1:4]
+            ):  # Search in name, email, and nickname
                 filtered_all_time_data.append(row)
-        
+
         # Update both tables
         self.populate_table(self.weekly_table, filtered_weekly_data)
         self.populate_table(self.rankings_table, filtered_all_time_data)
+
 
 def start_app(future_df=None, computation_manager=None):
     app = QApplication(sys.argv)
 
     # Set application-wide style
     app.setStyle("Fusion")
-
 
     # Set palette to match the overall theme
     palette = QPalette()
