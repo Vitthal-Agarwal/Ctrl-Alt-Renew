@@ -97,9 +97,9 @@ class ModernMolecularGUI(QMainWindow):
         self.future_schedule_page = self.create_future_schedule_page()
 
         # Add pages to stacked widget
-        self.stacked_widget.addWidget(self.home_page)            # Index 0
-        self.stacked_widget.addWidget(self.rankings_page)        # Index 1
-        self.stacked_widget.addWidget(self.future_schedule_page) # Index 2
+        self.stacked_widget.addWidget(self.home_page)  # Index 0
+        self.stacked_widget.addWidget(self.rankings_page)  # Index 1
+        self.stacked_widget.addWidget(self.future_schedule_page)  # Index 2
 
         # Set default page
         self.stacked_widget.setCurrentWidget(self.home_page)
@@ -110,21 +110,21 @@ class ModernMolecularGUI(QMainWindow):
             """
             QFrame {
                 background-color: #1E1E1E;
-                min-width: 300px;  /* Increased width for better margins */
+                min-width: 300px;  /* Sidebar width */
                 max-width: 300px;
-                padding: 30px;     /* Increased padding */
+                padding: 30px;     /* Sidebar padding */
             }
             QLabel {
                 color: white;
             }
             QPushButton {
                 text-align: left;
-                padding: 15px;          /* Increased padding */
-                margin: 6px 0;          /* Increased margin */
+                padding: 15px;          /* Button padding */
+                margin: 6px 0;          /* Button margin */
                 color: white;
                 border-radius: 8px;
-                font-size: 16px;        /* Increased font size */
-                font-weight: 500;       /* Slightly bolder font */
+                font-size: 16px;        /* Button font size */
+                font-weight: 500;       /* Button font weight */
             }
             QPushButton:hover {
                 background-color: #333333;
@@ -136,21 +136,44 @@ class ModernMolecularGUI(QMainWindow):
         )
 
         layout = QVBoxLayout(sidebar)
-        layout.setSpacing(30)  # Increased spacing between elements
+        layout.setSpacing(30)  # Spacing between sidebar elements
         layout.setContentsMargins(0, 0, 0, 0)
 
         # App Name Logo
         logo_label = QLabel("MolecularUniverse")
         logo_label.setStyleSheet(
-            "font-size: 24px; font-weight: bold; color: white; margin-bottom: 40px;"  # Increased font size and margin
+            "font-size: 24px; font-weight: bold; color: white; margin-bottom: 40px;"  # Logo styling
         )
         layout.addWidget(logo_label, alignment=Qt.AlignCenter)
 
         # Profile section
         profile_widget = QWidget()
         profile_layout = QVBoxLayout(profile_widget)
-        profile_layout.setSpacing(15)  # Increased spacing between profile elements
+        profile_layout.setSpacing(15)  # Spacing between profile elements
         profile_layout.setAlignment(Qt.AlignCenter)
+
+        # Profile Picture
+        profile_pic_label = QLabel()
+        profile_pic_label.setFixedSize(
+            150, 200
+        )  # Adjusted to 150x200 for better fitting
+        profile_pic_label.setAlignment(Qt.AlignCenter)
+        pixmap = QPixmap(
+            "dan.jpeg"
+        )  # Ensure 'dan.jpeg' is in the same directory as 'gui.py'
+        if pixmap.isNull():
+            pixmap = QPixmap(150, 200)
+            pixmap.fill(Qt.gray)
+        else:
+            pixmap = pixmap.scaled(
+                150, 200, Qt.KeepAspectRatio, Qt.SmoothTransformation
+            )
+
+        # Set the pixmap without circular masking
+        profile_pic_label.setPixmap(pixmap)
+        profile_pic_label.setStyleSheet(
+            "border-radius: 10px;"  # Optional: Add slight rounding without border
+        )
 
         # User Name
         user_name_label = QLabel("Dan Walsh")
@@ -159,25 +182,6 @@ class ModernMolecularGUI(QMainWindow):
         )
         user_name_label.setAlignment(Qt.AlignCenter)
 
-        # Profile Picture
-        profile_pic_label = QLabel()
-        profile_pic_label.setFixedSize(100, 100)  # Adjusted to 100x100 for better fitting
-        profile_pic_label.setAlignment(Qt.AlignCenter)
-        pixmap = QPixmap("dan.jpeg")  # Replace with your image file
-        if pixmap.isNull():
-            pixmap = QPixmap(100, 100)
-            pixmap.fill(Qt.gray)
-        else:
-            pixmap = pixmap.scaled(
-                100, 100, Qt.KeepAspectRatio, Qt.SmoothTransformation
-            )
-
-        # Set the pixmap without circular masking
-        profile_pic_label.setPixmap(pixmap)
-        profile_pic_label.setStyleSheet(
-            "border: 2px solid #7CD332; border-radius: 10px;"  # Optional: Add border and slight rounding
-        )
-
         # Edit Button
         edit_button = QPushButton("Edit")
         edit_button.setStyleSheet(
@@ -185,8 +189,8 @@ class ModernMolecularGUI(QMainWindow):
             QPushButton {
                 background-color: transparent;
                 border: 1px solid #444;
-                padding: 8px 12px;  /* Increased padding */
-                font-size: 14px;     /* Increased font size */
+                padding: 8px 12px;  /* Button padding */
+                font-size: 14px;     /* Button font size */
                 border-radius: 6px;
             }
             QPushButton:hover {
@@ -195,9 +199,9 @@ class ModernMolecularGUI(QMainWindow):
         """
         )
 
-        # Assemble profile layout
-        profile_layout.addWidget(user_name_label)
-        profile_layout.addWidget(profile_pic_label)
+        # Assemble profile layout: Image above Name
+        profile_layout.addWidget(profile_pic_label, alignment=Qt.AlignCenter)
+        profile_layout.addWidget(user_name_label, alignment=Qt.AlignCenter)
         profile_layout.addWidget(edit_button, alignment=Qt.AlignCenter)
         layout.addWidget(profile_widget)
 
@@ -219,7 +223,7 @@ class ModernMolecularGUI(QMainWindow):
         layout.addWidget(self.rankings_btn)
         layout.addWidget(self.future_schedule_btn)
 
-        # Add spacer
+        # Add spacer to push logout and version to the bottom
         layout.addStretch()
 
         # Logout and version
@@ -229,7 +233,7 @@ class ModernMolecularGUI(QMainWindow):
             QPushButton {
                 background-color: transparent;
                 color: #888;
-                font-size: 14px;  /* Increased font size */
+                font-size: 14px;  /* Logout button font size */
             }
             QPushButton:hover {
                 color: #AAA;
@@ -257,7 +261,9 @@ class ModernMolecularGUI(QMainWindow):
 
         layout = QVBoxLayout(content_widget)
         layout.setSpacing(20)
-        layout.setContentsMargins(30, 30, 30, 30)  # Increased margins for better spacing
+        layout.setContentsMargins(
+            30, 30, 30, 30
+        )  # Increased margins for better spacing
 
         # Calculation Workflow card
         workflow_card = self.create_workflow_card()
@@ -334,7 +340,7 @@ class ModernMolecularGUI(QMainWindow):
         options_widget = QWidget()
         options_layout = QHBoxLayout(options_widget)
         options_layout.setAlignment(Qt.AlignCenter)
-        options_layout.setSpacing(50)  # Spacing between options
+        options_layout.setSpacing(15)  # Spacing between options
 
         # Auto Option
         auto_widget = QWidget()
