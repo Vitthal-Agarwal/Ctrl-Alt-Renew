@@ -886,6 +886,14 @@ class ModernMolecularGUI(QMainWindow):
         search_label.setStyleSheet("font-size: 14px; font-weight: normal; color: #666;")
         self.search_input = QLineEdit()
         self.search_input.setPlaceholderText("Type here...")
+        self.search_input.setFixedWidth(400)
+        # Explicitly disconnect any existing connections to avoid duplicates
+        try:
+            self.search_input.textChanged.disconnect()
+        except:
+            pass
+        # Connect the search signal
+        self.search_input.textChanged.connect(self.filter_tables)
         
         # Period Selection with improved styling
         period_label = QLabel("Period:")
@@ -932,39 +940,129 @@ class ModernMolecularGUI(QMainWindow):
 
         return rankings_widget
 
+    def filter_tables(self, search_text):
+        """
+        Enhanced filter function for both tables
+        """
+        search_text = search_text.lower().strip()
+        
+        # Helper function to check if row matches search criteria
+        def matches_search(row_data):
+            # Check full name (index 1)
+            if search_text in str(row_data[1]).lower():
+                return True
+            # Check email (index 2)
+            if search_text in str(row_data[2]).lower():
+                return True
+            # Check nickname (index 3)
+            if search_text in str(row_data[3]).lower():
+                return True
+            return False
+
+        # Filter weekly table
+        if hasattr(self, 'weekly_table') and hasattr(self, 'weekly_data'):
+            filtered_weekly = [row for row in self.weekly_data if matches_search(row)]
+            self.update_table_data(self.weekly_table, filtered_weekly)
+
+        # Filter all-time table
+        if hasattr(self, 'rankings_table') and hasattr(self, 'all_time_data'):
+            filtered_alltime = [row for row in self.all_time_data if matches_search(row)]
+            self.update_table_data(self.rankings_table, filtered_alltime)
+
+    def update_table_data(self, table, filtered_data):
+        """
+        Update table with filtered data while maintaining styling
+        """
+        table.setRowCount(len(filtered_data))
+        
+        for row_idx, row_data in enumerate(filtered_data):
+            for col_idx, value in enumerate(row_data):
+                item = QTableWidgetItem(str(value))
+                item.setTextAlignment(Qt.AlignCenter)
+                
+                # Apply column-specific styling
+                if col_idx == 0:  # Position
+                    item.setForeground(QColor("#666666"))
+                    item.setFont(QFont("Arial", 10, QFont.Bold))
+                elif col_idx == 4:  # Score
+                    item.setForeground(QColor("#007AFF"))
+                    item.setFont(QFont("Arial", 10, QFont.Bold))
+                    # Right-align score
+                    item.setTextAlignment(Qt.AlignRight | Qt.AlignVCenter)
+                elif col_idx == 5:  # Molecules
+                    item.setForeground(QColor("#28A745"))
+                    item.setFont(QFont("Arial", 10))
+                    # Right-align molecules
+                    item.setTextAlignment(Qt.AlignRight | Qt.AlignVCenter)
+                elif col_idx == 1:  # Full Name
+                    item.setTextAlignment(Qt.AlignLeft | Qt.AlignVCenter)
+                elif col_idx == 2:  # Email
+                    item.setTextAlignment(Qt.AlignLeft | Qt.AlignVCenter)
+                    item.setForeground(QColor("#666666"))
+                
+                # Make items non-editable
+                item.setFlags(item.flags() & ~Qt.ItemIsEditable)
+                table.setItem(row_idx, col_idx, item)
+            
+            # Set row height
+            table.setRowHeight(row_idx, 40)
+
+        # Adjust column widths after updating data
+        self.adjust_table_columns(table)
+
+    def adjust_table_columns(self, table):
+        """
+        Adjust column widths for optimal display
+        """
+        header = table.horizontalHeader()
+        
+        # Set specific column widths and behaviors
+        column_configs = {
+            0: ("Position", 80, QHeaderView.Fixed),
+            1: ("Full Name", 200, QHeaderView.Stretch),
+            2: ("Email", 250, QHeaderView.Stretch),
+            3: ("Nickname", 120, QHeaderView.Fixed),
+            4: ("Score", 100, QHeaderView.Fixed),
+            5: ("Molecules", 100, QHeaderView.Fixed)
+        }
+        
+        for col, (name, width, resize_mode) in column_configs.items():
+            header.setSectionResizeMode(col, resize_mode)
+            if resize_mode == QHeaderView.Fixed:
+                table.setColumnWidth(col, width)
+
     def create_leaderboard_table(self):
+        """
+        Create a table with proper configuration
+        """
         table = QTableWidget()
         table.setColumnCount(6)
         table.setHorizontalHeaderLabels(["Position", "Full Name", "Email", "Nickname", "Score", "Molecules"])
         
-        # Enhanced table properties
+        # Table properties
         table.setShowGrid(False)
         table.setAlternatingRowColors(True)
+        table.verticalHeader().setVisible(False)
+        table.horizontalHeader().setHighlightSections(False)
         table.setStyleSheet("""
             QTableWidget {
                 background-color: white;
                 alternate-background-color: #F8F8F8;
+                border: none;
+                border-radius: 8px;
             }
             QTableWidget::item {
+                padding: 8px;
                 border-bottom: 1px solid #EEE;
             }
+            QTableWidget::item:selected {
+                background-color: #F0F7FF;
+                color: black;
+            }
         """)
-        table.verticalHeader().setVisible(False)
-        table.horizontalHeader().setHighlightSections(False)
         
-        # Column widths
-        header = table.horizontalHeader()
-        header.setSectionResizeMode(0, QHeaderView.Fixed)  # Position
-        header.setSectionResizeMode(1, QHeaderView.Stretch)  # Full Name
-        header.setSectionResizeMode(2, QHeaderView.Stretch)  # Email
-        header.setSectionResizeMode(3, QHeaderView.Fixed)  # Nickname
-        header.setSectionResizeMode(4, QHeaderView.Fixed)  # Score
-        header.setSectionResizeMode(5, QHeaderView.Fixed)  # Molecules
-        
-        table.setColumnWidth(0, 100)  # Position
-        table.setColumnWidth(3, 150)  # Nickname
-        table.setColumnWidth(4, 100)  # Score
-        table.setColumnWidth(5, 100)  # Molecules
+        # Initialize column adjustments
+        self.adjust_table_columns(table)
         
         return table
 
