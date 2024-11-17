@@ -20,6 +20,7 @@ from PyQt5.QtWidgets import (
     QCalendarWidget,
     QTimeEdit,
     QLineEdit,
+    QComboBox,
 )
 from PyQt5.QtCore import Qt, QSize, QRect, QDate, QTimer, QTime
 from PyQt5.QtGui import QFont, QColor, QPalette, QIcon, QPixmap, QPainter, QBrush, QPen
@@ -384,6 +385,19 @@ class ModernMolecularGUI(QMainWindow):
         # Set default page
         self.stacked_widget.setCurrentWidget(self.home_page)
 
+    def update_period(self):
+        selected_period = self.period_combo.currentText()
+        
+        # Implement logic to filter data based on the selected period
+        if selected_period == "Last 30 days":
+            # Filter or modify self.all_time_data as needed
+            self.populate_table(self.rankings_table, self.all_time_data)  # Replace with actual filtering logic
+        elif selected_period == "Last 60 days":
+            # Implement logic for Last 60 days
+            self.populate_table(self.rankings_table, self.all_time_data)  # Replace with actual filtering logic
+        elif selected_period == "All time":
+            # Show all-time data
+            self.populate_table(self.rankings_table, self.all_time_data)  # Replace with actual filtering logic
 
     def create_sidebar(self):
         sidebar = QFrame()
@@ -780,10 +794,24 @@ class ModernMolecularGUI(QMainWindow):
             QWidget {
                 background-color: #F5F5F5;
             }
-        """
+            QLabel {
+                font-size: 24px;
+                font-weight: bold;
+                color: #333;
+            }
+            QComboBox {
+                padding: 8px;
+                font-size: 14px;
+            }
+            """
         )
+        
         layout = QVBoxLayout(rankings_widget)
         layout.setAlignment(Qt.AlignCenter)
+
+        # Title
+        title_label = QLabel("Ranking")
+        layout.addWidget(title_label, alignment=Qt.AlignLeft)
 
         # Search Bar
         search_layout = QHBoxLayout()
@@ -795,37 +823,50 @@ class ModernMolecularGUI(QMainWindow):
         search_layout.addWidget(search_label)
         search_layout.addWidget(self.search_input)
 
+        # Period Selection
+        period_label = QLabel("Period:")
+        self.period_combo = QComboBox()
+        self.period_combo.addItems(["Last 30 days", "Last 60 days", "All time"])
+        search_layout.addWidget(period_label)
+        search_layout.addWidget(self.period_combo)
+
         layout.addLayout(search_layout)
 
-        # Rankings Table
+        # Weekly Leaderboard
+        weekly_label = QLabel("Weekly Leaderboard 🥇")
+        layout.addWidget(weekly_label, alignment=Qt.AlignLeft)
+
+        self.weekly_table = QTableWidget()
+        self.weekly_table.setColumnCount(6)
+        self.weekly_table.setHorizontalHeaderLabels(
+            ["Position", "Full Name", "Email", "Nickname", "Score", "Molecules"]
+        )
+        self.weekly_table.setStyleSheet(self.get_table_style())
+        
+        # Sample Weekly Data
+        self.weekly_data = [
+            [1, "Alice Smith", "alice@example.com", "Alice", 1500, 100],
+            [2, "Bob Johnson", "bob@example.com", "Bob", 1400, 90],
+            [3, "Charlie Brown", "charlie@example.com", "Charlie", 1300, 80],
+            [4, "David Wilson", "david@example.com", "David", 1200, 70],
+            [5, "Eva Green", "eva@example.com", "Eva", 1100, 60],
+        ]
+        self.populate_table(self.weekly_table, self.weekly_data)
+        layout.addWidget(self.weekly_table)
+
+        # All-Time Leaderboard
+        all_time_label = QLabel("All-Time Leaderboard 🏆")
+        layout.addWidget(all_time_label, alignment=Qt.AlignLeft)
+
         self.rankings_table = QTableWidget()
         self.rankings_table.setColumnCount(6)
         self.rankings_table.setHorizontalHeaderLabels(
             ["Position", "Full Name", "Email", "Nickname", "Score", "Molecules"]
         )
-        self.rankings_table.setStyleSheet(
-            """
-            QTableWidget {
-                background-color: white;
-                gridline-color: #E0E0E0;
-            }
-            QHeaderView::section {
-                background-color: #F0F0F0;
-                padding: 6px;
-                border: none;
-                font-weight: bold;
-                color: #666;
-                font-size: 14px;
-            }
-            QTableWidget::item {
-                padding: 5px;
-                font-size: 14px;
-            }
-        """
-        )
-
-        # Sample Data (Replace with actual data)
-        sample_data = [
+        self.rankings_table.setStyleSheet(self.get_table_style())
+        
+        # Sample All-Time Data
+        self.all_time_data = [
             [1, "Andre Neto Win", "andre.neto.c.w@conceptpatech.com", "Neto Win", 132383, 360],
             [2, "Dan Hannah", "dan.hannah@ses.ai", "dan.hannah", 126554, 199],
             [3, "Roberta QATest", "robertaqatest@gmail.com", "qatest", 109424, 170],
@@ -835,17 +876,42 @@ class ModernMolecularGUI(QMainWindow):
             [7, "Raquel Comunale", "comunale.qa@gmail.com", "comunale.qa", 24005, 41],
             [8, "Raul Burd", "raul@conceptpatech.com", "RB", 22928, 52],
         ]
+        self.populate_table(self.rankings_table, self.all_time_data)
+        layout.addWidget(self.rankings_table)
 
-        self.rankings_table.setRowCount(len(sample_data))
-        for row_idx, row_data in enumerate(sample_data):
+        # Connect signals
+        self.search_input.textChanged.connect(self.filter_table)
+        self.period_combo.currentIndexChanged.connect(self.update_period)
+
+        return rankings_widget
+
+    def get_table_style(self):
+        return """
+        QTableWidget {
+            background-color: white;
+            gridline-color: #E0E0E0;
+        }
+        QHeaderView::section {
+            background-color: #F0F0F0;
+            padding: 6px;
+            border: none;
+            font-weight: bold;
+            color: #666;
+            font-size: 14px;
+        }
+        QTableWidget::item {
+            padding: 5px;
+            font-size: 14px;
+        }
+        """
+
+    def populate_table(self, table, data):
+        table.setRowCount(len(data))
+        for row_idx, row_data in enumerate(data):
             for col_idx, value in enumerate(row_data):
                 item = QTableWidgetItem(str(value))
                 item.setTextAlignment(Qt.AlignCenter)
-                self.rankings_table.setItem(row_idx, col_idx, item)
-
-        layout.addWidget(self.rankings_table)
-
-        return rankings_widget
+                table.setItem(row_idx, col_idx, item)
 
     def create_future_schedule_page(self):
         # Integrate SchedulerGUI into the Future Schedule page
@@ -1193,6 +1259,17 @@ class ModernMolecularGUI(QMainWindow):
             }
         """
         )
+
+    def filter_table(self):
+        search_text = self.search_input.text().lower()
+
+        # Filter Weekly Table
+        filtered_weekly_data = [row for row in self.weekly_data if any(search_text in str(item).lower() for item in row)]
+        self.populate_table(self.weekly_table, filtered_weekly_data)
+
+        # Filter All-Time Table
+        filtered_all_time_data = [row for row in self.all_time_data if any(search_text in str(item).lower() for item in row)]
+        self.populate_table(self.rankings_table, filtered_all_time_data)
 
 def start_app(future_df=None, computation_manager=None):
     app = QApplication(sys.argv)
