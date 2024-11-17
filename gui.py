@@ -333,6 +333,27 @@ class ModernMolecularGUI(QMainWindow):
         super().__init__()
         self.future_df = future_df
         self.computation_manager = computation_manager
+        
+        # Initialize data for leaderboards
+        self.weekly_data = [
+            [1, "Alice Smith", "alice@example.com", "Alice", 1500, 100],
+            [2, "Bob Johnson", "bob@example.com", "Bob", 1400, 90],
+            [3, "Charlie Brown", "charlie@example.com", "Charlie", 1300, 80],
+            [4, "David Wilson", "david@example.com", "David", 1200, 70],
+            [5, "Eva Green", "eva@example.com", "Eva", 1100, 60],
+        ]
+        
+        self.all_time_data = [
+            [1, "Andre Neto Win", "andre.neto.c.w@conceptpatech.com", "Neto Win", 132383, 360],
+            [2, "Dan Hannah", "dan.hannah@ses.ai", "dan.hannah", 126554, 199],
+            [3, "Roberta QATest", "robertaqatest@gmail.com", "qatest", 109424, 170],
+            [4, "Cristiano Moraes", "cristianomoraescar@gmail.com", "ccmoraes", 81421, 121],
+            [5, "Daniel Walsh", "danwalshhh@gmail.com", "Dan", 50477, 91],
+            [6, "Leandro Barbosa", "leandro@fanhero.com", "leeaandrob", 36100, 60],
+            [7, "Raquel Comunale", "comunale.qa@gmail.com", "comunale.qa", 24005, 41],
+            [8, "Raul Burd", "raul@conceptpatech.com", "RB", 22928, 52],
+        ]
+        
         self.initUI()
 
     def initUI(self):
@@ -793,25 +814,46 @@ class ModernMolecularGUI(QMainWindow):
             """
             QWidget {
                 background-color: #F5F5F5;
+                padding: 20px;
             }
             QLabel {
                 font-size: 24px;
                 font-weight: bold;
                 color: #333;
+                margin-bottom: 10px;
             }
-            QComboBox {
+            QComboBox, QLineEdit {
                 padding: 8px;
+                font-size: 14px;
+                margin-right: 10px;
+            }
+            QTableWidget {
+                background-color: white;
+                gridline-color: #E0E0E0;
+                border: 1px solid #E0E0E0;
+                margin-bottom: 20px;
+            }
+            QHeaderView::section {
+                background-color: #F0F0F0;
+                padding: 6px;
+                border: none;
+                font-weight: bold;
+                color: #666;
+                font-size: 14px;
+            }
+            QTableWidget::item {
+                padding: 10px;
                 font-size: 14px;
             }
             """
         )
         
         layout = QVBoxLayout(rankings_widget)
-        layout.setAlignment(Qt.AlignCenter)
+        layout.setAlignment(Qt.AlignTop)
 
         # Title
         title_label = QLabel("Ranking")
-        layout.addWidget(title_label, alignment=Qt.AlignLeft)
+        layout.addWidget(title_label)
 
         # Search Bar
         search_layout = QHBoxLayout()
@@ -819,7 +861,6 @@ class ModernMolecularGUI(QMainWindow):
         search_label.setStyleSheet("font-size: 16px; color: #333;")
         self.search_input = QLineEdit()
         self.search_input.setPlaceholderText("Type here...")
-        self.search_input.setStyleSheet("padding: 8px; font-size: 14px;")
         search_layout.addWidget(search_label)
         search_layout.addWidget(self.search_input)
 
@@ -834,48 +875,25 @@ class ModernMolecularGUI(QMainWindow):
 
         # Weekly Leaderboard
         weekly_label = QLabel("Weekly Leaderboard 🥇")
-        layout.addWidget(weekly_label, alignment=Qt.AlignLeft)
+        layout.addWidget(weekly_label)
 
         self.weekly_table = QTableWidget()
         self.weekly_table.setColumnCount(6)
         self.weekly_table.setHorizontalHeaderLabels(
             ["Position", "Full Name", "Email", "Nickname", "Score", "Molecules"]
         )
-        self.weekly_table.setStyleSheet(self.get_table_style())
-        
-        # Sample Weekly Data
-        self.weekly_data = [
-            [1, "Alice Smith", "alice@example.com", "Alice", 1500, 100],
-            [2, "Bob Johnson", "bob@example.com", "Bob", 1400, 90],
-            [3, "Charlie Brown", "charlie@example.com", "Charlie", 1300, 80],
-            [4, "David Wilson", "david@example.com", "David", 1200, 70],
-            [5, "Eva Green", "eva@example.com", "Eva", 1100, 60],
-        ]
         self.populate_table(self.weekly_table, self.weekly_data)
         layout.addWidget(self.weekly_table)
 
         # All-Time Leaderboard
         all_time_label = QLabel("All-Time Leaderboard 🏆")
-        layout.addWidget(all_time_label, alignment=Qt.AlignLeft)
+        layout.addWidget(all_time_label)
 
         self.rankings_table = QTableWidget()
         self.rankings_table.setColumnCount(6)
         self.rankings_table.setHorizontalHeaderLabels(
             ["Position", "Full Name", "Email", "Nickname", "Score", "Molecules"]
         )
-        self.rankings_table.setStyleSheet(self.get_table_style())
-        
-        # Sample All-Time Data
-        self.all_time_data = [
-            [1, "Andre Neto Win", "andre.neto.c.w@conceptpatech.com", "Neto Win", 132383, 360],
-            [2, "Dan Hannah", "dan.hannah@ses.ai", "dan.hannah", 126554, 199],
-            [3, "Roberta QATest", "robertaqatest@gmail.com", "qatest", 109424, 170],
-            [4, "Cristiano Moraes", "cristianomoraescar@gmail.com", "ccmoraes", 81421, 121],
-            [5, "Daniel Walsh", "danwalshhh@gmail.com", "Dan", 50477, 91],
-            [6, "Leandro Barbosa", "leandro@fanhero.com", "leeaandrob", 36100, 60],
-            [7, "Raquel Comunale", "comunale.qa@gmail.com", "comunale.qa", 24005, 41],
-            [8, "Raul Burd", "raul@conceptpatech.com", "RB", 22928, 52],
-        ]
         self.populate_table(self.rankings_table, self.all_time_data)
         layout.addWidget(self.rankings_table)
 
@@ -884,26 +902,6 @@ class ModernMolecularGUI(QMainWindow):
         self.period_combo.currentIndexChanged.connect(self.update_period)
 
         return rankings_widget
-
-    def get_table_style(self):
-        return """
-        QTableWidget {
-            background-color: white;
-            gridline-color: #E0E0E0;
-        }
-        QHeaderView::section {
-            background-color: #F0F0F0;
-            padding: 6px;
-            border: none;
-            font-weight: bold;
-            color: #666;
-            font-size: 14px;
-        }
-        QTableWidget::item {
-            padding: 5px;
-            font-size: 14px;
-        }
-        """
 
     def populate_table(self, table, data):
         table.setRowCount(len(data))
