@@ -13,6 +13,7 @@ from PyQt5.QtWidgets import (
     QHeaderView,
     QSpacerItem,
     QSizePolicy,
+    QStackedWidget,
 )
 from PyQt5.QtCore import Qt, QSize
 from PyQt5.QtGui import QFont, QColor, QPalette, QIcon
@@ -59,9 +60,22 @@ class ModernMolecularGUI(QMainWindow):
         sidebar = self.create_sidebar()
         main_layout.addWidget(sidebar)
 
-        # Add content area
-        content = self.create_content_area()
-        main_layout.addWidget(content, 1)  # 1 is the stretch factor
+        # Add content area with stacked widget for navigation
+        self.stacked_widget = QStackedWidget()
+        main_layout.addWidget(self.stacked_widget, 1)  # 1 is the stretch factor
+
+        # Create individual pages
+        self.home_page = self.create_home_page()
+        self.rankings_page = self.create_rankings_page()
+        self.future_schedule_page = self.create_future_schedule_page()
+
+        # Add pages to stacked widget
+        self.stacked_widget.addWidget(self.home_page)            # Index 0
+        self.stacked_widget.addWidget(self.rankings_page)        # Index 1
+        self.stacked_widget.addWidget(self.future_schedule_page) # Index 2
+
+        # Set default page
+        self.stacked_widget.setCurrentWidget(self.home_page)
 
     def create_sidebar(self):
         sidebar = QFrame()
@@ -82,6 +96,7 @@ class ModernMolecularGUI(QMainWindow):
                 margin: 4px;
                 color: white;
                 border-radius: 8px;
+                font-size: 14px;
             }
             QPushButton:hover {
                 background-color: #333333;
@@ -128,14 +143,22 @@ class ModernMolecularGUI(QMainWindow):
         layout.addWidget(profile_widget)
 
         # Navigation buttons
-        calculate_btn = QPushButton("🔢  Calculate")
-        calculate_btn.setObjectName("nav-active")
-        rankings_btn = QPushButton("📊  Rankings")
-        history_btn = QPushButton("📜  History")
+        # Updated button labels with emojis
+        self.home_btn = QPushButton("🏠  Home")
+        self.rankings_btn = QPushButton("📊  Rankings")
+        self.future_schedule_btn = QPushButton("📅  Future Schedule")
 
-        layout.addWidget(calculate_btn)
-        layout.addWidget(rankings_btn)
-        layout.addWidget(history_btn)
+        # Set object names for styling
+        self.home_btn.setObjectName("nav-active")  # Set Home as active by default
+
+        # Connect buttons to methods
+        self.home_btn.clicked.connect(self.show_home)
+        self.rankings_btn.clicked.connect(self.show_rankings)
+        self.future_schedule_btn.clicked.connect(self.show_future_schedule)
+
+        layout.addWidget(self.home_btn)
+        layout.addWidget(self.rankings_btn)
+        layout.addWidget(self.future_schedule_btn)
 
         # Add spacer
         layout.addStretch()
@@ -158,7 +181,7 @@ class ModernMolecularGUI(QMainWindow):
 
         return sidebar
 
-    def create_content_area(self):
+    def create_home_page(self):
         content_widget = QWidget()
         content_widget.setStyleSheet(
             """
@@ -185,6 +208,42 @@ class ModernMolecularGUI(QMainWindow):
         layout.addWidget(prev_calc_card)
 
         return content_widget
+
+    def create_rankings_page(self):
+        rankings_widget = QWidget()
+        rankings_widget.setStyleSheet(
+            """
+            QWidget {
+                background-color: #F5F5F5;
+            }
+        """
+        )
+        layout = QVBoxLayout(rankings_widget)
+        layout.setAlignment(Qt.AlignCenter)
+
+        label = QLabel("Rankings Page - Coming Soon!")
+        label.setStyleSheet("font-size: 24px; color: #666;")
+        layout.addWidget(label)
+
+        return rankings_widget
+
+    def create_future_schedule_page(self):
+        future_schedule_widget = QWidget()
+        future_schedule_widget.setStyleSheet(
+            """
+            QWidget {
+                background-color: #F5F5F5;
+            }
+        """
+        )
+        layout = QVBoxLayout(future_schedule_widget)
+        layout.setAlignment(Qt.AlignCenter)
+
+        label = QLabel("Future Schedule Page - Coming Soon!")
+        label.setStyleSheet("font-size: 24px; color: #666;")
+        layout.addWidget(label)
+
+        return future_schedule_widget
 
     def create_workflow_card(self):
         card = QFrame()
@@ -397,6 +456,54 @@ class ModernMolecularGUI(QMainWindow):
 
         layout.addWidget(table)
         return card
+
+    def show_home(self):
+        self.stacked_widget.setCurrentWidget(self.home_page)
+        self.update_nav_buttons(active_button=self.home_btn)
+
+    def show_rankings(self):
+        self.stacked_widget.setCurrentWidget(self.rankings_page)
+        self.update_nav_buttons(active_button=self.rankings_btn)
+
+    def show_future_schedule(self):
+        self.stacked_widget.setCurrentWidget(self.future_schedule_page)
+        self.update_nav_buttons(active_button=self.future_schedule_btn)
+
+    def update_nav_buttons(self, active_button):
+        # Reset all buttons
+        for btn in [self.home_btn, self.rankings_btn, self.future_schedule_btn]:
+            btn.setObjectName("")
+            btn.setStyleSheet(
+                """
+                QPushButton {
+                    text-align: left;
+                    padding: 12px;
+                    margin: 4px;
+                    color: white;
+                    border-radius: 8px;
+                    font-size: 14px;
+                }
+                QPushButton:hover {
+                    background-color: #333333;
+                }
+            """
+            )
+
+        # Highlight the active button
+        active_button.setObjectName("nav-active")
+        active_button.setStyleSheet(
+            """
+            QPushButton#nav-active {
+                background-color: #333333;
+                text-align: left;
+                padding: 12px;
+                margin: 4px;
+                color: white;
+                border-radius: 8px;
+                font-size: 14px;
+            }
+        """
+        )
 
 
 def start_app(future_df=None, computation_manager=None):
