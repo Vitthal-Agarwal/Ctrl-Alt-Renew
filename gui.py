@@ -14,9 +14,21 @@ from PyQt5.QtWidgets import (
     QSpacerItem,
     QSizePolicy,
     QStackedWidget,
+    QRadioButton,
+    QButtonGroup,
+    QCheckBox,
 )
-from PyQt5.QtCore import Qt, QSize
-from PyQt5.QtGui import QFont, QColor, QPalette, QIcon
+from PyQt5.QtCore import Qt, QSize, QRect
+from PyQt5.QtGui import (
+    QFont,
+    QColor,
+    QPalette,
+    QIcon,
+    QPixmap,
+    QPainter,
+    QBrush,
+    QPen,
+)
 
 
 class ModernMolecularGUI(QMainWindow):
@@ -28,7 +40,7 @@ class ModernMolecularGUI(QMainWindow):
 
     def initUI(self):
         self.setWindowTitle("Molecular Universe")
-        self.setGeometry(100, 100, 1200, 800)
+        self.showFullScreen()  # Make the application full screen
         self.setStyleSheet(
             """
             QMainWindow {
@@ -45,6 +57,21 @@ class ModernMolecularGUI(QMainWindow):
             }
             QPushButton:hover {
                 background-color: #404040;
+            }
+            QRadioButton {
+                font-size: 16px;
+            }
+            QCheckBox::indicator {
+                width: 40px;
+                height: 20px;
+            }
+            QCheckBox::indicator:checked {
+                background-color: #7CD332;
+                border-radius: 10px;
+            }
+            QCheckBox::indicator:unchecked {
+                background-color: #ccc;
+                border-radius: 10px;
             }
         """
         )
@@ -83,20 +110,21 @@ class ModernMolecularGUI(QMainWindow):
             """
             QFrame {
                 background-color: #1E1E1E;
-                min-width: 250px;
-                max-width: 250px;
-                padding: 20px;
+                min-width: 300px;  /* Increased width for better margins */
+                max-width: 300px;
+                padding: 30px;     /* Increased padding */
             }
             QLabel {
                 color: white;
             }
             QPushButton {
                 text-align: left;
-                padding: 12px;
-                margin: 4px;
+                padding: 15px;          /* Increased padding */
+                margin: 6px 0;          /* Increased margin */
                 color: white;
                 border-radius: 8px;
-                font-size: 14px;
+                font-size: 16px;        /* Increased font size */
+                font-weight: 500;       /* Slightly bolder font */
             }
             QPushButton:hover {
                 background-color: #333333;
@@ -108,38 +136,69 @@ class ModernMolecularGUI(QMainWindow):
         )
 
         layout = QVBoxLayout(sidebar)
-        layout.setSpacing(24)
+        layout.setSpacing(30)  # Increased spacing between elements
         layout.setContentsMargins(0, 0, 0, 0)
 
-        # Logo
+        # App Name Logo
         logo_label = QLabel("MolecularUniverse")
         logo_label.setStyleSheet(
-            "font-size: 20px; font-weight: bold; color: white; margin-bottom: 32px;"
+            "font-size: 24px; font-weight: bold; color: white; margin-bottom: 40px;"  # Increased font size and margin
         )
-        layout.addWidget(logo_label)
+        layout.addWidget(logo_label, alignment=Qt.AlignCenter)
 
         # Profile section
         profile_widget = QWidget()
         profile_layout = QVBoxLayout(profile_widget)
-        profile_layout.setSpacing(8)
+        profile_layout.setSpacing(15)  # Increased spacing between profile elements
+        profile_layout.setAlignment(Qt.AlignCenter)
 
-        profile_label = QLabel("Gabriel")
-        profile_label.setStyleSheet("font-size: 16px; color: white;")
+        # User Name
+        user_name_label = QLabel("Dan Walsh")
+        user_name_label.setStyleSheet(
+            "font-size: 18px; color: white; font-weight: bold;"
+        )
+        user_name_label.setAlignment(Qt.AlignCenter)
 
+        # Profile Picture
+        profile_pic_label = QLabel()
+        profile_pic_label.setFixedSize(100, 100)  # Adjusted to 100x100 for better fitting
+        profile_pic_label.setAlignment(Qt.AlignCenter)
+        pixmap = QPixmap("dan.jpeg")  # Replace with your image file
+        if pixmap.isNull():
+            pixmap = QPixmap(100, 100)
+            pixmap.fill(Qt.gray)
+        else:
+            pixmap = pixmap.scaled(
+                100, 100, Qt.KeepAspectRatio, Qt.SmoothTransformation
+            )
+
+        # Set the pixmap without circular masking
+        profile_pic_label.setPixmap(pixmap)
+        profile_pic_label.setStyleSheet(
+            "border: 2px solid #7CD332; border-radius: 10px;"  # Optional: Add border and slight rounding
+        )
+
+        # Edit Button
         edit_button = QPushButton("Edit")
         edit_button.setStyleSheet(
             """
             QPushButton {
                 background-color: transparent;
                 border: 1px solid #444;
-                padding: 6px;
-                font-size: 12px;
+                padding: 8px 12px;  /* Increased padding */
+                font-size: 14px;     /* Increased font size */
+                border-radius: 6px;
+            }
+            QPushButton:hover {
+                background-color: #555555;
             }
         """
         )
 
-        profile_layout.addWidget(profile_label)
-        profile_layout.addWidget(edit_button)
+        # Assemble profile layout
+        profile_layout.addWidget(user_name_label)
+        profile_layout.addWidget(profile_pic_label)
+        profile_layout.addWidget(edit_button, alignment=Qt.AlignCenter)
         layout.addWidget(profile_widget)
 
         # Navigation buttons
@@ -170,13 +229,18 @@ class ModernMolecularGUI(QMainWindow):
             QPushButton {
                 background-color: transparent;
                 color: #888;
+                font-size: 14px;  /* Increased font size */
+            }
+            QPushButton:hover {
+                color: #AAA;
             }
         """
         )
         layout.addWidget(logout_btn)
 
         version_label = QLabel("Version 0.1.1.0 (RC)")
-        version_label.setStyleSheet("color: #666; font-size: 12px; margin-top: 8px;")
+        version_label.setStyleSheet("color: #666; font-size: 12px; margin-top: 10px;")
+        version_label.setAlignment(Qt.AlignCenter)
         layout.addWidget(version_label)
 
         return sidebar
@@ -193,7 +257,7 @@ class ModernMolecularGUI(QMainWindow):
 
         layout = QVBoxLayout(content_widget)
         layout.setSpacing(20)
-        layout.setContentsMargins(20, 20, 20, 20)
+        layout.setContentsMargins(30, 30, 30, 30)  # Increased margins for better spacing
 
         # Calculation Workflow card
         workflow_card = self.create_workflow_card()
@@ -258,57 +322,139 @@ class ModernMolecularGUI(QMainWindow):
         )
 
         layout = QVBoxLayout(card)
-        layout.setSpacing(16)
+        layout.setSpacing(20)
 
         # Title and subtitle
         title = QLabel("Calculation Workflow")
         title.setStyleSheet("color: white; font-size: 24px; font-weight: bold;")
-        subtitle = QLabel("The program will execute when your computer is idle")
-        subtitle.setStyleSheet("color: #888;")
+        subtitle = QLabel("Choose your workflow mode")
+        subtitle.setStyleSheet("color: #888; font-size: 16px;")
 
-        # Control buttons
-        buttons_widget = QWidget()
-        buttons_layout = QHBoxLayout(buttons_widget)
-        buttons_layout.setAlignment(Qt.AlignRight)
+        # Options: Auto and Manual
+        options_widget = QWidget()
+        options_layout = QHBoxLayout(options_widget)
+        options_layout.setAlignment(Qt.AlignCenter)
+        options_layout.setSpacing(50)  # Spacing between options
 
-        stop_btn = QPushButton("Stop")
-        stop_btn.setStyleSheet(
-            """
-            QPushButton {
-                background-color: #333;
-                min-width: 80px;
-                padding: 8px 16px;
-            }
-        """
+        # Auto Option
+        auto_widget = QWidget()
+        auto_layout = QVBoxLayout(auto_widget)
+        auto_layout.setAlignment(Qt.AlignCenter)
+
+        auto_radio = QRadioButton("Auto")
+        auto_radio.setStyleSheet("color: white; font-size: 16px;")
+        auto_radio.setChecked(True)  # Default selection
+
+        # Description for Auto
+        auto_desc = QLabel(
+            "Automated response generated by the simulation and scheduling."
         )
+        auto_desc.setStyleSheet("color: #ccc; font-size: 14px; text-align: center;")
+        auto_desc.setWordWrap(True)
 
-        start_btn = QPushButton("Start")
-        start_btn.setStyleSheet(
+        auto_layout.addWidget(auto_radio)
+        auto_layout.addWidget(auto_desc)
+
+        # Manual Option
+        manual_widget = QWidget()
+        manual_layout = QVBoxLayout(manual_widget)
+        manual_layout.setAlignment(Qt.AlignCenter)
+
+        manual_radio = QRadioButton("Manual")
+        manual_radio.setStyleSheet("color: white; font-size: 16px;")
+
+        # Description for Manual
+        manual_desc = QLabel(
+            "Control the workflow manually with start and stop options."
+        )
+        manual_desc.setStyleSheet("color: #ccc; font-size: 14px; text-align: center;")
+        manual_desc.setWordWrap(True)
+
+        manual_layout.addWidget(manual_radio)
+        manual_layout.addWidget(manual_desc)
+
+        # Button Group to ensure only one is selected
+        self.workflow_group = QButtonGroup()
+        self.workflow_group.addButton(auto_radio)
+        self.workflow_group.addButton(manual_radio)
+        self.workflow_group.buttonClicked.connect(self.workflow_mode_changed)
+
+        options_layout.addWidget(auto_widget)
+        options_layout.addWidget(manual_widget)
+
+        # Control Buttons for Manual Mode
+        self.manual_controls_widget = QWidget()
+        self.manual_controls_layout = QHBoxLayout(self.manual_controls_widget)
+        self.manual_controls_layout.setAlignment(Qt.AlignCenter)
+        self.manual_controls_layout.setSpacing(20)
+
+        self.start_btn = QPushButton("Start")
+        self.start_btn.setStyleSheet(
             """
             QPushButton {
                 background-color: #7CD332;
-                min-width: 80px;
-                padding: 8px 16px;
+                min-width: 120px;
+                padding: 10px 20px;
+                font-size: 16px;
+                border-radius: 6px;
             }
             QPushButton:hover {
                 background-color: #6BC22B;
             }
         """
         )
+        self.start_btn.clicked.connect(self.start_manual_workflow)
 
-        buttons_layout.addWidget(stop_btn)
-        buttons_layout.addWidget(start_btn)
+        self.stop_btn = QPushButton("Stop")
+        self.stop_btn.setStyleSheet(
+            """
+            QPushButton {
+                background-color: #D9534F;
+                min-width: 120px;
+                padding: 10px 20px;
+                font-size: 16px;
+                border-radius: 6px;
+            }
+            QPushButton:hover {
+                background-color: #C9302C;
+            }
+        """
+        )
+        self.stop_btn.clicked.connect(self.stop_manual_workflow)
+        self.stop_btn.setEnabled(False)  # Initially disabled
 
-        # Status label
-        status = QLabel("⏳ Waiting for idle state")
-        status.setStyleSheet("color: #888;")
+        self.manual_controls_layout.addWidget(self.start_btn)
+        self.manual_controls_layout.addWidget(self.stop_btn)
+        self.manual_controls_widget.hide()  # Hidden by default
 
+        # Layout Assembly
         layout.addWidget(title)
         layout.addWidget(subtitle)
-        layout.addWidget(buttons_widget)
-        layout.addWidget(status)
+        layout.addWidget(options_widget)
+        layout.addWidget(self.manual_controls_widget)
+        layout.addStretch()
 
         return card
+
+    def workflow_mode_changed(self, button):
+        if button.text() == "Manual":
+            self.manual_controls_widget.show()
+        else:
+            self.manual_controls_widget.hide()
+
+    def start_manual_workflow(self):
+        # Implement start logic here
+        self.start_btn.setEnabled(False)
+        self.stop_btn.setEnabled(True)
+        # Example: self.computation_manager.start_workflow()
+        print("Manual workflow started.")
+
+    def stop_manual_workflow(self):
+        # Implement stop logic here
+        self.start_btn.setEnabled(True)
+        self.stop_btn.setEnabled(False)
+        # Example: self.computation_manager.stop_workflow()
+        print("Manual workflow stopped.")
 
     def create_current_calculation_card(self):
         card = QFrame()
@@ -325,7 +471,7 @@ class ModernMolecularGUI(QMainWindow):
         layout = QVBoxLayout(card)
 
         # Title
-        title = QLabel("Current calculation")
+        title = QLabel("Current Calculation")
         title.setStyleSheet("font-size: 20px; font-weight: bold; margin-bottom: 16px;")
         layout.addWidget(title)
 
@@ -340,19 +486,19 @@ class ModernMolecularGUI(QMainWindow):
                 background-color: #1E1E1E;
                 border-radius: 8px;
                 padding: 16px;
-                max-width: 120px;
+                max-width: 150px;  /* Increased width */
             }
         """
         )
         cycle_layout = QVBoxLayout(cycle_frame)
 
         cycle_label = QLabel("Cycle")
-        cycle_label.setStyleSheet("color: white;")
+        cycle_label.setStyleSheet("color: white; font-size: 16px;")
         cycle_num = QLabel("12")
         cycle_num.setStyleSheet("color: #7CD332; font-size: 24px; font-weight: bold;")
 
-        cycle_layout.addWidget(cycle_label)
-        cycle_layout.addWidget(cycle_num)
+        cycle_layout.addWidget(cycle_label, alignment=Qt.AlignCenter)
+        cycle_layout.addWidget(cycle_num, alignment=Qt.AlignCenter)
         info_grid.addWidget(cycle_frame)
 
         # Molecule info
@@ -360,9 +506,9 @@ class ModernMolecularGUI(QMainWindow):
         molecule_layout = QVBoxLayout(molecule_widget)
 
         molecule_title = QLabel("Molecule")
-        molecule_title.setStyleSheet("color: #666;")
+        molecule_title.setStyleSheet("color: #666; font-size: 16px;")
         molecule_name = QLabel("Ethane (C2H4)")
-        molecule_name.setStyleSheet("font-size: 16px;")
+        molecule_name.setStyleSheet("font-size: 16px; font-weight: 500;")
 
         molecule_layout.addWidget(molecule_title)
         molecule_layout.addWidget(molecule_name)
@@ -373,9 +519,9 @@ class ModernMolecularGUI(QMainWindow):
         chars_layout = QVBoxLayout(chars_widget)
 
         chars_title = QLabel("Characteristics")
-        chars_title.setStyleSheet("color: #666;")
+        chars_title.setStyleSheet("color: #666; font-size: 16px;")
         chars_value = QLabel("Alcohol")
-        chars_value.setStyleSheet("font-size: 16px;")
+        chars_value.setStyleSheet("font-size: 16px; font-weight: 500;")
 
         chars_layout.addWidget(chars_title)
         chars_layout.addWidget(chars_value)
@@ -399,7 +545,7 @@ class ModernMolecularGUI(QMainWindow):
         layout = QVBoxLayout(card)
 
         # Title
-        title = QLabel("Previous calculations")
+        title = QLabel("Previous Calculations")
         title.setStyleSheet("font-size: 20px; font-weight: bold; margin-bottom: 16px;")
         layout.addWidget(title)
 
@@ -417,15 +563,23 @@ class ModernMolecularGUI(QMainWindow):
                 border: none;
                 font-weight: bold;
                 color: #666;
+                font-size: 14px;
+            }
+            QTableWidget::item {
+                font-size: 14px;
             }
         """
         )
 
         # Set up table
-        headers = ["Name", "Score", "Date", "CPU time", "Settings", ""]
+        headers = ["Name", "Score", "Date", "CPU time", "Settings", "Actions"]
         table.setColumnCount(len(headers))
         table.setHorizontalHeaderLabels(headers)
         table.horizontalHeader().setSectionResizeMode(QHeaderView.Stretch)
+        table.verticalHeader().setVisible(False)
+        table.setEditTriggers(QTableWidget.NoEditTriggers)
+        table.setSelectionBehavior(QTableWidget.SelectRows)
+        table.setSelectionMode(QTableWidget.SingleSelection)
 
         # Add sample data
         sample_data = [
@@ -449,6 +603,10 @@ class ModernMolecularGUI(QMainWindow):
                     background-color: transparent;
                     color: #666;
                     text-decoration: underline;
+                    font-size: 14px;
+                }
+                QPushButton:hover {
+                    color: #333;
                 }
             """
             )
@@ -477,11 +635,12 @@ class ModernMolecularGUI(QMainWindow):
                 """
                 QPushButton {
                     text-align: left;
-                    padding: 12px;
-                    margin: 4px;
+                    padding: 15px;
+                    margin: 6px 0;
                     color: white;
                     border-radius: 8px;
-                    font-size: 14px;
+                    font-size: 16px;
+                    font-weight: 500;
                 }
                 QPushButton:hover {
                     background-color: #333333;
@@ -496,11 +655,12 @@ class ModernMolecularGUI(QMainWindow):
             QPushButton#nav-active {
                 background-color: #333333;
                 text-align: left;
-                padding: 12px;
-                margin: 4px;
+                padding: 15px;
+                margin: 6px 0;
                 color: white;
                 border-radius: 8px;
-                font-size: 14px;
+                font-size: 16px;
+                font-weight: 500;
             }
         """
         )
