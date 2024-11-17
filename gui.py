@@ -352,6 +352,18 @@ class ModernMolecularGUI(QMainWindow):
             [6, "Leandro Barbosa", "leandro@fanhero.com", "leeaandrob", 36100, 60],
             [7, "Raquel Comunale", "comunale.qa@gmail.com", "comunale.qa", 24005, 41],
             [8, "Raul Burd", "raul@conceptpatech.com", "RB", 22928, 52],
+            [9, "Sarah Chen", "sarah.chen@example.com", "SarahC", 21500, 48],
+        [10, "Michael Rodriguez", "mrodriguez@example.com", "MikeR", 20100, 45],
+        [11, "Emma Thompson", "emma.t@example.com", "EmmaT", 19500, 43],
+        [12, "James Wilson", "jwilson@example.com", "JWil", 18900, 40],
+        [13, "Lisa Anderson", "lisa.a@example.com", "LisaA", 17800, 38],
+        [14, "Kevin Park", "kpark@example.com", "KPark", 16700, 35],
+        [15, "Maria Garcia", "mgarcia@example.com", "MariaG", 15600, 33],
+        [16, "Thomas Brown", "tbrown@example.com", "TomB", 14500, 30],
+        [17, "Anna Kim", "akim@example.com", "AnnaK", 13400, 28],
+        [18, "Peter Zhang", "pzhang@example.com", "PeterZ", 12300, 25],
+        [19, "Sophie Martin", "smartin@example.com", "SophieM", 11200, 23],
+        [20, "David Lee", "dlee@example.com", "DaveL", 10100, 20],
         ]
         
         self.initUI()
@@ -821,60 +833,66 @@ class ModernMolecularGUI(QMainWindow):
                 color: #333;
             }
             QLineEdit {
-                padding: 8px;
+                padding: 12px;
                 font-size: 14px;
-                border: 1px solid #ddd;
+                border: 1px solid #E0E0E0;
                 border-radius: 4px;
                 background: white;
+                min-width: 300px;
             }
             QComboBox {
-                padding: 8px;
-                border: 1px solid #ddd;
+                padding: 8px 12px;
+                border: 1px solid #E0E0E0;
                 border-radius: 4px;
                 background: white;
+                min-width: 150px;
             }
             QTableWidget {
                 background-color: white;
-                border: 1px solid #ddd;
-                border-radius: 4px;
+                border: none;
+                border-radius: 8px;
+                gridline-color: transparent;
             }
             QHeaderView::section {
                 background-color: white;
-                padding: 8px;
+                padding: 15px;
                 border: none;
-                border-bottom: 1px solid #ddd;
+                border-bottom: 2px solid #E0E0E0;
                 font-weight: bold;
+                color: #666;
+                font-size: 14px;
             }
             QTableWidget::item {
-                padding: 8px;
+                padding: 15px;
                 border: none;
+            }
+            QTableWidget::item:selected {
+                background-color: #F5F5F5;
+                color: black;
             }
             """
         )
 
-        # Main Layout
+        # Main Layout with increased padding
         layout = QVBoxLayout(rankings_widget)
-        layout.setContentsMargins(20, 20, 20, 20)
-        layout.setSpacing(20)
+        layout.setContentsMargins(30, 30, 30, 30)
+        layout.setSpacing(30)
 
         # Header Section
         header_layout = QHBoxLayout()
         
-        # Search Section
+        # Search Section with improved styling
         search_label = QLabel("Search by full name, nickname or email:")
-        search_label.setStyleSheet("font-size: 14px; font-weight: normal;")
+        search_label.setStyleSheet("font-size: 14px; font-weight: normal; color: #666;")
         self.search_input = QLineEdit()
         self.search_input.setPlaceholderText("Type here...")
-        self.search_input.setFixedWidth(400)
         
-        # Period Selection
-        period_layout = QHBoxLayout()
+        # Period Selection with improved styling
         period_label = QLabel("Period:")
-        period_label.setStyleSheet("font-size: 14px; font-weight: normal;")
+        period_label.setStyleSheet("font-size: 14px; font-weight: normal; color: #666;")
         self.period_combo = QComboBox()
         self.period_combo.addItems(["Last 30 days", "Last 60 days", "All time"])
         
-        # Add to header layout
         header_layout.addWidget(search_label)
         header_layout.addWidget(self.search_input)
         header_layout.addStretch()
@@ -883,7 +901,7 @@ class ModernMolecularGUI(QMainWindow):
         
         layout.addLayout(header_layout)
 
-        # Weekly Leaderboard
+        # Weekly Leaderboard with more sample data
         weekly_label = QLabel("Weekly Leaderboard 🥇")
         layout.addWidget(weekly_label)
         
@@ -894,31 +912,23 @@ class ModernMolecularGUI(QMainWindow):
             [3, "Charlie Brown", "charlie@example.com", "Charlie", 1300, 80],
             [4, "David Wilson", "david@example.com", "David", 1200, 70],
             [5, "Eva Green", "eva@example.com", "Eva", 1100, 60],
+            [6, "Frank Miller", "frank@example.com", "Frank", 1000, 55],
+            [7, "Grace Lee", "grace@example.com", "Grace", 950, 50],
+            [8, "Henry Ford", "henry@example.com", "Henry", 900, 45],
+            [9, "Iris West", "iris@example.com", "Iris", 850, 40],
+            [10, "Jack Ryan", "jack@example.com", "Jack", 800, 35],
         ]
         self.populate_table(self.weekly_table, self.weekly_data)
         layout.addWidget(self.weekly_table)
 
-        # All-Time Leaderboard
+        # All-Time Leaderboard with existing data
         all_time_label = QLabel("All-Time Leaderboard 🏆")
         layout.addWidget(all_time_label)
         
         self.rankings_table = self.create_leaderboard_table()
-        self.all_time_data = [
-            [1, "Andre Neto Win", "andre.neto.c.w@conceptpatech.com", "Neto Win", 132383, 360],
-            [2, "Dan Hannah", "dan.hannah@ses.ai", "dan.hannah", 126554, 199],
-            [3, "Roberta QATest", "robertaqatest@gmail.com", "qatest", 109424, 170],
-            [4, "Cristiano Moraes", "cristianomoraescar@gmail.com", "ccmoraes", 81421, 121],
-            [5, "Daniel Walsh", "danwalshhh@gmail.com", "Dan", 50477, 91],
-            [6, "Leandro Barbosa", "leandro@fanhero.com", "leeaandrob", 36100, 60],
-            [7, "Raquel Comunale", "comunale.qa@gmail.com", "comunale.qa", 24005, 41],
-            [8, "Raul Burd", "raul@conceptpatech.com", "RB", 22928, 52],
-        ]
+        # Keep your existing all_time_data
         self.populate_table(self.rankings_table, self.all_time_data)
         layout.addWidget(self.rankings_table)
-
-        # Connect signals
-        self.search_input.textChanged.connect(self.filter_table)
-        self.period_combo.currentIndexChanged.connect(self.update_period)
 
         return rankings_widget
 
@@ -927,9 +937,18 @@ class ModernMolecularGUI(QMainWindow):
         table.setColumnCount(6)
         table.setHorizontalHeaderLabels(["Position", "Full Name", "Email", "Nickname", "Score", "Molecules"])
         
-        # Table properties
+        # Enhanced table properties
         table.setShowGrid(False)
         table.setAlternatingRowColors(True)
+        table.setStyleSheet("""
+            QTableWidget {
+                background-color: white;
+                alternate-background-color: #F8F8F8;
+            }
+            QTableWidget::item {
+                border-bottom: 1px solid #EEE;
+            }
+        """)
         table.verticalHeader().setVisible(False)
         table.horizontalHeader().setHighlightSections(False)
         
@@ -942,7 +961,7 @@ class ModernMolecularGUI(QMainWindow):
         header.setSectionResizeMode(4, QHeaderView.Fixed)  # Score
         header.setSectionResizeMode(5, QHeaderView.Fixed)  # Molecules
         
-        table.setColumnWidth(0, 80)  # Position
+        table.setColumnWidth(0, 100)  # Position
         table.setColumnWidth(3, 150)  # Nickname
         table.setColumnWidth(4, 100)  # Score
         table.setColumnWidth(5, 100)  # Molecules
@@ -950,13 +969,31 @@ class ModernMolecularGUI(QMainWindow):
         return table
 
     def populate_table(self, table, data):
+        """
+        Populate table with data and maintain consistent styling
+        """
         table.setRowCount(len(data))
         for row_idx, row_data in enumerate(data):
             for col_idx, value in enumerate(row_data):
                 item = QTableWidgetItem(str(value))
                 item.setTextAlignment(Qt.AlignCenter)
+                
+                # Style specific columns
+                if col_idx == 0:  # Position column
+                    item.setForeground(QColor("#666666"))
+                    item.setFont(QFont("Arial", 10, QFont.Bold))
+                elif col_idx == 4:  # Score column
+                    item.setForeground(QColor("#007AFF"))
+                    item.setFont(QFont("Arial", 10, QFont.Bold))
+                elif col_idx == 5:  # Molecules column
+                    item.setForeground(QColor("#28A745"))
+                    item.setFont(QFont("Arial", 10))
+                
                 item.setFlags(item.flags() & ~Qt.ItemIsEditable)
                 table.setItem(row_idx, col_idx, item)
+            
+            # Set row height
+            table.setRowHeight(row_idx, 40)
 
     def create_future_schedule_page(self):
         # Integrate SchedulerGUI into the Future Schedule page
@@ -1306,14 +1343,25 @@ class ModernMolecularGUI(QMainWindow):
         )
 
     def filter_table(self):
+        """
+        Filter both tables based on search input
+        """
         search_text = self.search_input.text().lower()
-
+        
         # Filter Weekly Table
-        filtered_weekly_data = [row for row in self.weekly_data if any(search_text in str(item).lower() for item in row)]
-        self.populate_table(self.weekly_table, filtered_weekly_data)
-
+        filtered_weekly_data = []
+        for row in self.weekly_data:
+            if any(search_text in str(item).lower() for item in row[1:4]):  # Search in name, email, and nickname
+                filtered_weekly_data.append(row)
+        
         # Filter All-Time Table
-        filtered_all_time_data = [row for row in self.all_time_data if any(search_text in str(item).lower() for item in row)]
+        filtered_all_time_data = []
+        for row in self.all_time_data:
+            if any(search_text in str(item).lower() for item in row[1:4]):  # Search in name, email, and nickname
+                filtered_all_time_data.append(row)
+        
+        # Update both tables
+        self.populate_table(self.weekly_table, filtered_weekly_data)
         self.populate_table(self.rankings_table, filtered_all_time_data)
 
 def start_app(future_df=None, computation_manager=None):
