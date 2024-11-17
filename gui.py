@@ -731,43 +731,17 @@ class ModernMolecularGUI(QMainWindow):
         auto_mode_btn = QPushButton("Auto Mode")
         auto_mode_btn.setCursor(Qt.PointingHandCursor)
         auto_mode_btn.setFixedSize(180, 40)
-        auto_mode_btn.setStyleSheet(
-            """
-            QPushButton {
-                background-color: #7CD332;
-                color: white;
-                border: none;
-                border-radius: 8px;
-                font-size: 15px;
-                font-weight: bold;
-                font-family: 'Segoe UI', Arial;
-            }
-            QPushButton:hover {
-                background-color: #6BB22E;
-            }
-        """
-        )
-
+        auto_mode_btn.clicked.connect(self.start_auto_mode)  # Connect signal
+        
         # Manual Mode Button
         manual_mode_btn = QPushButton("Manual Mode")
         manual_mode_btn.setCursor(Qt.PointingHandCursor)
         manual_mode_btn.setFixedSize(180, 40)
-        manual_mode_btn.setStyleSheet(
-            """
-            QPushButton {
-                background-color: #FFA500;
-                color: white;
-                border: none;
-                border-radius: 8px;
-                font-size: 15px;
-                font-weight: bold;
-                font-family: 'Segoe UI', Arial;
-            }
-            QPushButton:hover {
-                background-color: #E69500;
-            }
-        """
-        )
+        manual_mode_btn.clicked.connect(self.start_manual_mode)  # Connect signal
+        
+        # Store buttons as class attributes
+        self.auto_button = auto_mode_btn
+        self.manual_button = manual_mode_btn
 
         buttons_layout.addWidget(auto_mode_btn, alignment=Qt.AlignCenter)
         buttons_layout.addWidget(manual_mode_btn, alignment=Qt.AlignCenter)
@@ -790,13 +764,16 @@ class ModernMolecularGUI(QMainWindow):
         # Add center container to main layout
         main_layout.addWidget(center_container)
 
-        return home_widget
-
-    def start_auto_mode(self):
-        # Display a banner that Auto Mode has started
-        self.notification_banner.setText("Auto Mode has started.")
-        self.notification_banner.setStyleSheet(
-            """
+        # Add state variables and timer at the beginning of create_home_page
+        self.cpu_usage_timer = QTimer()
+        self.cpu_usage_timer.timeout.connect(self.update_cpu_usage)
+        self.cpu_usage_level = 0
+        self.manual_mode_active = False
+        
+        # Add notification banner
+        self.notification_banner = QLabel()
+        self.notification_banner.setFixedHeight(50)
+        self.notification_banner.setStyleSheet("""
             QLabel {
                 background-color: #7CD332;
                 color: white;
@@ -804,40 +781,49 @@ class ModernMolecularGUI(QMainWindow):
                 padding: 10px;
                 border-radius: 8px;
             }
-        """
-        )
+        """)
+        self.notification_banner.hide()
+        workflow_layout.addWidget(self.notification_banner)
+
+        return home_widget
+
+    def start_auto_mode(self):
+        """Handle auto mode activation"""
+        self.notification_banner.setText("Auto Mode has started.")
+        self.notification_banner.setStyleSheet("""
+            QLabel {
+                background-color: #7CD332;
+                color: white;
+                font-size: 18px;
+                padding: 10px;
+                border-radius: 8px;
+            }
+        """)
         self.notification_banner.show()
-
-        # Hide the banner after 3 seconds
         QTimer.singleShot(3000, self.notification_banner.hide)
-
-        # Start updating CPU usage
-        self.cpu_usage_timer.start(1000)  # Update every second
+        self.cpu_usage_timer.start(1000)
 
     def start_manual_mode(self):
+        """Handle manual mode activation/deactivation"""
         if not self.manual_mode_active:
-            # Change button to Stop
             self.manual_button.setText("Stop")
-            self.manual_button.setStyleSheet(
-                """
+            self.manual_button.setStyleSheet("""
                 QPushButton {
                     background-color: #D9534F;
-                    border-radius: 30px;
                     color: white;
-                    font-size: 20px;
+                    border: none;
+                    border-radius: 8px;
+                    font-size: 15px;
                     font-weight: bold;
+                    font-family: 'Segoe UI', Arial;
                 }
                 QPushButton:hover {
                     background-color: #C9302C;
                 }
-            """
-            )
+            """)
             self.manual_mode_active = True
-
-            # Display a banner
             self.notification_banner.setText("Manual Mode has started.")
-            self.notification_banner.setStyleSheet(
-                """
+            self.notification_banner.setStyleSheet("""
                 QLabel {
                     background-color: #FFA500;
                     color: white;
@@ -845,36 +831,29 @@ class ModernMolecularGUI(QMainWindow):
                     padding: 10px;
                     border-radius: 8px;
                 }
-            """
-            )
+            """)
             self.notification_banner.show()
             QTimer.singleShot(3000, self.notification_banner.hide)
-
-            # Start updating CPU usage
-            self.cpu_usage_timer.start(1000)  # Update every second
+            self.cpu_usage_timer.start(1000)
         else:
-            # Change button back to Manual Mode
             self.manual_button.setText("Manual Mode")
-            self.manual_button.setStyleSheet(
-                """
+            self.manual_button.setStyleSheet("""
                 QPushButton {
                     background-color: #FFA500;
-                    border-radius: 30px;
                     color: white;
-                    font-size: 20px;
+                    border: none;
+                    border-radius: 8px;
+                    font-size: 15px;
                     font-weight: bold;
+                    font-family: 'Segoe UI', Arial;
                 }
                 QPushButton:hover {
-                    background-color: #E59400;
+                    background-color: #E69500;
                 }
-            """
-            )
+            """)
             self.manual_mode_active = False
-
-            # Display a banner
             self.notification_banner.setText("Manual Mode has stopped.")
-            self.notification_banner.setStyleSheet(
-                """
+            self.notification_banner.setStyleSheet("""
                 QLabel {
                     background-color: #D9534F;
                     color: white;
@@ -882,19 +861,21 @@ class ModernMolecularGUI(QMainWindow):
                     padding: 10px;
                     border-radius: 8px;
                 }
-            """
-            )
+            """)
             self.notification_banner.show()
             QTimer.singleShot(3000, self.notification_banner.hide)
-
-            # Stop updating CPU usage
             self.cpu_usage_timer.stop()
 
     def update_cpu_usage(self):
-        # Simulate CPU usage level change
+        """Update CPU usage display"""
         self.cpu_usage_level = random.randint(0, 100)
-        self.current_cpu_value.setText(f"{self.cpu_usage_level} Units")
-
+        self.current_units.setText(f"{self.cpu_usage_level} Units")
+        
+        # Update total CPU units by extracting current total and adding new units
+        current_total = int(self.total_units.text().split()[0])  # Extract number from "X Units"
+        new_total = current_total + self.cpu_usage_level
+        self.total_units.setText(f"{new_total} Units")
+        
         # Change color based on CPU usage level
         if self.cpu_usage_level < 30:
             color = "#7CD332"  # Green
@@ -904,14 +885,13 @@ class ModernMolecularGUI(QMainWindow):
             color = "#FFA500"  # Orange
         else:
             color = "#D9534F"  # Red
-
-        self.current_cpu_value.setStyleSheet(
-            f"color: {color}; font-size: 48px; font-weight: bold;"
-        )
-
-        # Update total CPU units contributed
-        total_units = int(self.total_cpu_value.text().split()[0]) + self.cpu_usage_level
-        self.total_cpu_value.setText(f"{total_units} Units")
+        
+        self.current_units.setStyleSheet(f"""
+            font-size: 42px;
+            font-weight: bold;
+            color: {color};
+            font-family: 'Segoe UI', Arial;
+        """)
 
     def create_rankings_page(self):
         rankings_widget = QWidget()
