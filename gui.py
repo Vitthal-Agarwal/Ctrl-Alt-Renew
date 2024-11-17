@@ -336,8 +336,7 @@ class ModernMolecularGUI(QMainWindow):
     def initUI(self):
         self.setWindowTitle("Molecular Universe")
         self.showFullScreen()  # Make the application full screen
-        self.setStyleSheet(
-            """
+        self.setStyleSheet("""
             QMainWindow {
                 background-color: #F5F5F5;
             }
@@ -358,20 +357,7 @@ class ModernMolecularGUI(QMainWindow):
                 font-size: 16px;
                 color: white;
             }
-            QCheckBox::indicator {
-                width: 40px;
-                height: 20px;
-            }
-            QCheckBox::indicator:checked {
-                background-color: #7CD332;
-                border-radius: 10px;
-            }
-            QCheckBox::indicator:unchecked {
-                background-color: #ccc;
-                border-radius: 10px;
-            }
-        """
-        )
+        """)
 
         # Create main widget and layout
         main_widget = QWidget()
@@ -400,6 +386,7 @@ class ModernMolecularGUI(QMainWindow):
 
         # Set default page
         self.stacked_widget.setCurrentWidget(self.home_page)
+
 
     def create_sidebar(self):
         sidebar = QFrame()
@@ -549,33 +536,122 @@ class ModernMolecularGUI(QMainWindow):
 
     def create_home_page(self):
         content_widget = QWidget()
-        content_widget.setStyleSheet(
-            """
+        content_widget.setStyleSheet("""
             QWidget {
                 background-color: #F5F5F5;
             }
-        """
-        )
+        """)
 
         layout = QVBoxLayout(content_widget)
         layout.setSpacing(20)
-        layout.setContentsMargins(
-            30, 30, 30, 30
-        )  # Increased margins for better spacing
+        layout.setContentsMargins(30, 30, 30, 30)
 
-        # Calculation Workflow card
-        workflow_card = self.create_workflow_card()
-        layout.addWidget(workflow_card)
+        # **Add CPU Units Given Boxes**
+        cpu_boxes_widget = QWidget()
+        cpu_boxes_layout = QVBoxLayout(cpu_boxes_widget)
+        cpu_boxes_layout.setAlignment(Qt.AlignCenter)
+        cpu_boxes_layout.setSpacing(20)
 
-        # Current calculation card
-        current_calc_card = self.create_current_calculation_card()
-        layout.addWidget(current_calc_card)
+        # Current CPU Power Units Given Box
+        current_cpu_box = QFrame()
+        current_cpu_box.setFixedSize(400, 150)
+        current_cpu_box.setStyleSheet("""
+            QFrame {
+                background-color: #1E1E1E;
+                border-radius: 20px;
+            }
+        """)
+        current_cpu_layout = QVBoxLayout(current_cpu_box)
+        current_cpu_label = QLabel("Current CPU Power Units Given")
+        current_cpu_label.setStyleSheet("color: white; font-size: 24px;")
+        current_cpu_value = QLabel("1500 Units")
+        current_cpu_value.setStyleSheet("color: #7CD332; font-size: 48px; font-weight: bold;")
+        current_cpu_layout.addStretch()
+        current_cpu_layout.addWidget(current_cpu_label, alignment=Qt.AlignCenter)
+        current_cpu_layout.addWidget(current_cpu_value, alignment=Qt.AlignCenter)
+        current_cpu_layout.addStretch()
 
-        # Previous calculations card
-        prev_calc_card = self.create_previous_calculations_card()
-        layout.addWidget(prev_calc_card)
+        # Total CPU Units Given So Far Box
+        total_cpu_box = QFrame()
+        total_cpu_box.setFixedSize(350, 120)
+        total_cpu_box.setStyleSheet("""
+            QFrame {
+                background-color: #333333;
+                border-radius: 20px;
+            }
+        """)
+        total_cpu_layout = QVBoxLayout(total_cpu_box)
+        total_cpu_label = QLabel("Total CPU Units Contributed")
+        total_cpu_label.setStyleSheet("color: white; font-size: 20px;")
+        total_cpu_value = QLabel("25,000 Units")
+        total_cpu_value.setStyleSheet("color: #FFD700; font-size: 36px; font-weight: bold;")
+        total_cpu_layout.addStretch()
+        total_cpu_layout.addWidget(total_cpu_label, alignment=Qt.AlignCenter)
+        total_cpu_layout.addWidget(total_cpu_value, alignment=Qt.AlignCenter)
+        total_cpu_layout.addStretch()
+
+        cpu_boxes_layout.addWidget(current_cpu_box)
+        cpu_boxes_layout.addWidget(total_cpu_box)
+
+        layout.addWidget(cpu_boxes_widget, alignment=Qt.AlignCenter)
+
+        # **Add Auto and Manual Buttons**
+        workflow_buttons_widget = QWidget()
+        workflow_buttons_layout = QHBoxLayout(workflow_buttons_widget)
+        workflow_buttons_layout.setAlignment(Qt.AlignCenter)
+        workflow_buttons_layout.setSpacing(40)
+
+        # Auto Button
+        auto_button = QPushButton("Auto Mode")
+        auto_button.setFixedSize(180, 60)
+        auto_button.setStyleSheet("""
+            QPushButton {
+                background-color: #7CD332;
+                border-radius: 30px;
+                color: white;
+                font-size: 20px;
+                font-weight: bold;
+            }
+            QPushButton:hover {
+                background-color: #6BC22B;
+            }
+        """)
+        auto_button.clicked.connect(self.start_auto_mode)
+
+        # Manual Button
+        manual_button = QPushButton("Manual Mode")
+        manual_button.setFixedSize(180, 60)
+        manual_button.setStyleSheet("""
+            QPushButton {
+                background-color: #FFA500;
+                border-radius: 30px;
+                color: white;
+                font-size: 20px;
+                font-weight: bold;
+            }
+            QPushButton:hover {
+                background-color: #E59400;
+            }
+        """)
+        manual_button.clicked.connect(self.start_manual_mode)
+
+        workflow_buttons_layout.addWidget(auto_button)
+        workflow_buttons_layout.addWidget(manual_button)
+
+        layout.addWidget(workflow_buttons_widget, alignment=Qt.AlignCenter)
+
+        # Spacer to push content to the top
+        layout.addStretch()
 
         return content_widget
+    
+    def start_auto_mode(self):
+        # Implement the logic for starting auto mode
+        print("Auto Mode Started")
+
+    def start_manual_mode(self):
+        # Implement the logic for starting manual mode
+        print("Manual Mode Started")
 
     def create_rankings_page(self):
         rankings_widget = QWidget()

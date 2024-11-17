@@ -1,7 +1,6 @@
 # main.py
 
 from data_preparation import prepare_data, train_model, predict_future_usage
-from scheduler import schedule_computations
 from gui import ModernMolecularGUI, QApplication
 import threading
 import sys
@@ -40,14 +39,14 @@ def main():
     # Step 3: Initialize computation manager
     computation_manager = ComputationManager()
 
-    # Step 4: Start the scheduler in a separate thread
-    print("Starting computation scheduler...")
-    scheduler_thread = threading.Thread(
-        target=schedule_computations, 
-        args=(future_df, computation_manager)
-    )
-    scheduler_thread.daemon = True
-    scheduler_thread.start()
+    # # Step 4: Start the scheduler in a separate thread
+    # print("Starting computation scheduler...")
+    # scheduler_thread = threading.Thread(
+    #     target=schedule_computations, 
+    #     args=(future_df, computation_manager)
+    # )
+    # scheduler_thread.daemon = True
+    # scheduler_thread.start()
 
     # Step 5: Start the GUI
     print("Launching Molecular Universe interface...")

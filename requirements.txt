@@ -3,4 +3,3 @@ numpy
 xgboost
 joblib
 apscheduler
-tkinter  # Note: tkinter is usually included with Python installations
