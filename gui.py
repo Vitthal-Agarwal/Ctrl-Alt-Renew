@@ -21,9 +21,11 @@ from PyQt5.QtWidgets import (
     QTimeEdit,
     QLineEdit,
     QComboBox,
+    QGraphicsDropShadowEffect,
 )
 from PyQt5.QtCore import Qt, QSize, QRect, QDate, QTimer, QTime
 from PyQt5.QtGui import QFont, QColor, QPalette, QIcon, QPixmap, QPainter, QBrush, QPen
+from PyQt5.QtWidgets import QGraphicsDropShadowEffect
 import pandas as pd
 
 
@@ -579,137 +581,160 @@ class ModernMolecularGUI(QMainWindow):
         return sidebar
 
     def create_home_page(self):
-        content_widget = QWidget()
-        content_widget.setStyleSheet("""
-            QWidget {
-                background-color: #F5F5F5;
-            }
-        """)
-
-        layout = QVBoxLayout(content_widget)
-        layout.setSpacing(20)
-        layout.setContentsMargins(30, 30, 30, 30)
-
-        # **Notification Banner**
-        self.notification_banner = QLabel()
-        self.notification_banner.setFixedHeight(50)
-        self.notification_banner.setStyleSheet("""
-            QLabel {
-                background-color: #7CD332;
-                color: white;
-                font-size: 18px;
-                padding: 10px;
-                border-radius: 8px;
-            }
-        """)
-        self.notification_banner.hide()  # Hidden by default
-        layout.addWidget(self.notification_banner)
-
-        # **Add CPU Units Given Boxes**
-        cpu_boxes_widget = QWidget()
-        cpu_boxes_layout = QVBoxLayout(cpu_boxes_widget)
-        cpu_boxes_layout.setAlignment(Qt.AlignCenter)
-        cpu_boxes_layout.setSpacing(20)
-
-        # Current CPU Power Units Given Box
-        self.current_cpu_box = QFrame()
-        self.current_cpu_box.setFixedSize(400, 150)
-        self.current_cpu_box.setStyleSheet("""
+        """Create a perfectly centered home page with integrated workflow container"""
+        home_widget = QWidget()
+        main_layout = QVBoxLayout(home_widget)
+        main_layout.setContentsMargins(0, 50, 0, 50)  # Add vertical margins
+        
+        # Center container
+        center_container = QWidget()
+        center_layout = QVBoxLayout(center_container)
+        center_layout.setAlignment(Qt.AlignCenter)
+        
+        # Calculation workflow container
+        workflow_container = QFrame()
+        workflow_container.setStyleSheet("""
             QFrame {
                 background-color: #1E1E1E;
                 border-radius: 20px;
+                min-width: 500px;
+                max-width: 500px;
+                padding: 40px;
             }
         """)
-        current_cpu_layout = QVBoxLayout(self.current_cpu_box)
-        current_cpu_label = QLabel("Current CPU Power Units Given")
-        current_cpu_label.setStyleSheet("color: white; font-size: 24px;")
-        self.current_cpu_value = QLabel("0 Units")
-        self.current_cpu_value.setStyleSheet("color: #7CD332; font-size: 48px; font-weight: bold;")
-        current_cpu_layout.addStretch()
-        current_cpu_layout.addWidget(current_cpu_label, alignment=Qt.AlignCenter)
-        current_cpu_layout.addWidget(self.current_cpu_value, alignment=Qt.AlignCenter)
-        current_cpu_layout.addStretch()
-
-        # Total CPU Units Given So Far Box
-        self.total_cpu_box = QFrame()
-        self.total_cpu_box.setFixedSize(350, 120)
-        self.total_cpu_box.setStyleSheet("""
+        workflow_layout = QVBoxLayout(workflow_container)
+        workflow_layout.setSpacing(30)  # Increased spacing between elements
+        
+        # Current CPU Units Box
+        current_cpu_box = QFrame()
+        current_cpu_box.setStyleSheet("""
             QFrame {
-                background-color: #333333;
-                border-radius: 20px;
+                background-color: #262626;
+                border-radius: 15px;
+                padding: 20px 30px;
             }
         """)
-        total_cpu_layout = QVBoxLayout(self.total_cpu_box)
-        total_cpu_label = QLabel("Total CPU Units Contributed")
-        total_cpu_label.setStyleSheet("color: white; font-size: 20px;")
-        self.total_cpu_value = QLabel("0 Units")
-        self.total_cpu_value.setStyleSheet("color: #FFD700; font-size: 36px; font-weight: bold;")
-        total_cpu_layout.addStretch()
-        total_cpu_layout.addWidget(total_cpu_label, alignment=Qt.AlignCenter)
-        total_cpu_layout.addWidget(self.total_cpu_value, alignment=Qt.AlignCenter)
-        total_cpu_layout.addStretch()
-
-        cpu_boxes_layout.addWidget(self.current_cpu_box)
-        cpu_boxes_layout.addWidget(self.total_cpu_box)
-
-        layout.addWidget(cpu_boxes_widget, alignment=Qt.AlignCenter)
-
-        # **Add Auto and Manual Buttons**
-        workflow_buttons_widget = QWidget()
-        workflow_buttons_layout = QHBoxLayout(workflow_buttons_widget)
-        workflow_buttons_layout.setAlignment(Qt.AlignCenter)
-        workflow_buttons_layout.setSpacing(40)
-
-        # Auto Button
-        self.auto_button = QPushButton("Auto Mode")
-        self.auto_button.setFixedSize(180, 60)
-        self.auto_button.setStyleSheet("""
+        current_cpu_layout = QVBoxLayout(current_cpu_box)
+        current_cpu_layout.setSpacing(8)
+        
+        current_label = QLabel("Current CPU Power Units Given")
+        current_label.setStyleSheet("""
+            font-size: 16px;
+            color: #E0E0E0;
+            font-family: 'Segoe UI', Arial;
+        """)
+        current_label.setAlignment(Qt.AlignCenter)
+        
+        self.current_units = QLabel("0 Units")
+        self.current_units.setStyleSheet("""
+            font-size: 42px;
+            font-weight: bold;
+            color: #7CD332;
+            font-family: 'Segoe UI', Arial;
+        """)
+        self.current_units.setAlignment(Qt.AlignCenter)
+        
+        current_cpu_layout.addWidget(current_label)
+        current_cpu_layout.addWidget(self.current_units)
+        
+        # Total CPU Units Box
+        total_cpu_box = QFrame()
+        total_cpu_box.setStyleSheet("""
+            QFrame {
+                background-color: #262626;
+                border-radius: 15px;
+                padding: 20px 30px;
+            }
+        """)
+        total_cpu_layout = QVBoxLayout(total_cpu_box)
+        total_cpu_layout.setSpacing(8)
+        
+        total_label = QLabel("Total CPU Units Contributed")
+        total_label.setStyleSheet("""
+            font-size: 16px;
+            color: #E0E0E0;
+            font-family: 'Segoe UI', Arial;
+        """)
+        total_label.setAlignment(Qt.AlignCenter)
+        
+        self.total_units = QLabel("0 Units")
+        self.total_units.setStyleSheet("""
+            font-size: 42px;
+            font-weight: bold;
+            color: #FFD700;
+            font-family: 'Segoe UI', Arial;
+        """)
+        self.total_units.setAlignment(Qt.AlignCenter)
+        
+        total_cpu_layout.addWidget(total_label)
+        total_cpu_layout.addWidget(self.total_units)
+        
+        # Mode Buttons Container
+        buttons_container = QWidget()
+        buttons_layout = QHBoxLayout(buttons_container)
+        buttons_layout.setSpacing(15)
+        buttons_layout.setContentsMargins(0, 15, 0, 0)
+        
+        # Auto Mode Button
+        auto_mode_btn = QPushButton("Auto Mode")
+        auto_mode_btn.setCursor(Qt.PointingHandCursor)
+        auto_mode_btn.setFixedSize(180, 40)
+        auto_mode_btn.setStyleSheet("""
             QPushButton {
                 background-color: #7CD332;
-                border-radius: 30px;
                 color: white;
-                font-size: 20px;
+                border: none;
+                border-radius: 8px;
+                font-size: 15px;
                 font-weight: bold;
+                font-family: 'Segoe UI', Arial;
             }
             QPushButton:hover {
-                background-color: #6BC22B;
+                background-color: #6BB22E;
             }
         """)
-        self.auto_button.clicked.connect(self.start_auto_mode)
-
-        # Manual Button
-        self.manual_button = QPushButton("Manual Mode")
-        self.manual_button.setFixedSize(180, 60)
-        self.manual_button.setStyleSheet("""
+        
+        # Manual Mode Button
+        manual_mode_btn = QPushButton("Manual Mode")
+        manual_mode_btn.setCursor(Qt.PointingHandCursor)
+        manual_mode_btn.setFixedSize(180, 40)
+        manual_mode_btn.setStyleSheet("""
             QPushButton {
                 background-color: #FFA500;
-                border-radius: 30px;
                 color: white;
-                font-size: 20px;
+                border: none;
+                border-radius: 8px;
+                font-size: 15px;
                 font-weight: bold;
+                font-family: 'Segoe UI', Arial;
             }
             QPushButton:hover {
-                background-color: #E59400;
+                background-color: #E69500;
             }
         """)
-        self.manual_button.clicked.connect(self.start_manual_mode)
-
-        workflow_buttons_layout.addWidget(self.auto_button)
-        workflow_buttons_layout.addWidget(self.manual_button)
-
-        layout.addWidget(workflow_buttons_widget, alignment=Qt.AlignCenter)
-
-        # Spacer to push content to the top
-        layout.addStretch()
-
-        # **Timers and State Variables**
-        self.cpu_usage_timer = QTimer()
-        self.cpu_usage_timer.timeout.connect(self.update_cpu_usage)
-        self.cpu_usage_level = 0  # Simulated CPU usage level
-
-        self.manual_mode_active = False  # Track manual mode state
-
-        return content_widget
+        
+        buttons_layout.addWidget(auto_mode_btn, alignment=Qt.AlignCenter)
+        buttons_layout.addWidget(manual_mode_btn, alignment=Qt.AlignCenter)
+        
+        # Add all elements to workflow container
+        workflow_layout.addWidget(current_cpu_box)
+        workflow_layout.addWidget(total_cpu_box)
+        workflow_layout.addWidget(buttons_container)
+        
+        # Add shadow effect
+        shadow = QGraphicsDropShadowEffect()
+        shadow.setBlurRadius(30)
+        shadow.setColor(QColor(0, 0, 0, 60))
+        shadow.setOffset(0, 5)
+        workflow_container.setGraphicsEffect(shadow)
+        
+        # Add workflow container to center layout
+        center_layout.addWidget(workflow_container, alignment=Qt.AlignCenter)
+        
+        # Add center container to main layout
+        main_layout.addWidget(center_container)
+        
+        return home_widget
 
     def start_auto_mode(self):
         # Display a banner that Auto Mode has started
